@@ -125,20 +125,39 @@ export function SignInFormClient(): React.JSX.Element {
         left: 0,
       }}
     >
+       <Box
+          component="img"
+          src="/assets/CCI.png"
+          alt="Logo"
+          sx={{
+            width: 150,
+            height: 160,
+            borderRadius: 2,
+            boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
+            transform: 'translateY(15px)', // Ajuste fino de alineación vertical
+            flexShrink: 0,
+            '@media (max-width: 400px)': {
+              transform: 'translateY(0)',
+              marginBottom: 2,
+              width: 100,
+              height: 140,
+            },
+          }}
+        />
       <Stack
         spacing={3}
-        sx={{
-          background: 'linear-gradient(145deg, rgba(51,0,27,0.9) 0%, rgba(74,0,31,0.7) 100%)',
-          borderRadius: 2,
-          p: 4,
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
-          maxWidth: 450,
-          width: '100%',
-          mx: 'auto',
-          color: 'white',
-          backdropFilter: 'blur(4px)',
-          border: '1px solid rgba(255,255,255,0.1)',
-        }}
+       sx={{
+            background: 'linear-gradient(145deg, rgba(209, 39, 48, 0.9) 0%, rgba(119, 14, 20, 0.6) 100%)',
+            borderRadius: 3,
+            p: 4,
+            boxShadow: '0 12px 40px rgba(139, 11, 11, 0.4)',
+            width: '100%',
+            maxWidth: 450,
+            color: 'white',
+            backdropFilter: 'blur(8px)',
+            border: '1px solid rgba(32, 7, 7, 0.15)',
+          }}
+        
       >
         <Typography
           variant="h4"
