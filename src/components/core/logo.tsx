@@ -36,7 +36,7 @@ export function Logo({
   return (
     <Box
       component="img"
-      alt="Logo Scala"
+      alt="Logo CCI"
       src={logoUrl}
       sx={{
         alignItems: 'center',
