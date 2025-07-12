@@ -124,7 +124,7 @@ export function ResetPasswordForm(): React.JSX.Element {
     <Box sx={{
       minHeight: '100vh',
       width: '100vw',
-      backgroundImage: 'url(/assets/cci-fondo.png)',
+      backgroundImage: 'url(/assets/fondo-cci.jpg)',
       backgroundSize: 'cover',
       backgroundRepeat: 'no-repeat',
       backgroundPosition: 'center',
