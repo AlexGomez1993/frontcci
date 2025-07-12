@@ -71,7 +71,7 @@ export function SignInForm(): React.JSX.Element {
       sx={{
         minHeight: '100vh',
         width: '100vw',
-        backgroundImage: 'url(/assets/cci-fondo.png)',
+        backgroundImage: 'url(/assets/fondo-cci.jpg)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         display: 'flex',
@@ -86,39 +86,29 @@ export function SignInForm(): React.JSX.Element {
       <Box
         sx={{
           display: 'flex',
+          justifyContent: 'center',
           alignItems: 'center',
-          gap: 1,
-          maxWidth: 800,
           width: '100%',
-          position: 'relative',
+          minHeight: '100vh',
+          p: 2,
         }}
       >
-        <Box
-          component="img"
-          src="/assets/CCI.png"
-          alt="Logo"
-          sx={{
-            width: 150,
-            height: 160,
-            borderRadius: 2,
-            boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
-            transform: 'translateY(15px)', // Ajuste fino de alineación vertical
-            flexShrink: 0,
-            '@media (max-width: 400px)': {
-              transform: 'translateY(0)',
-              marginBottom: 2,
-              width: 100,
-              height: 140,
-            },
-          }}
-        />
         <Stack
           spacing={3}
           sx={{
-            background: 'linear-gradient(145deg, rgba(209, 39, 48, 0.9) 0%, rgba(119, 14, 20, 0.6) 100%)',
+            background: `
+        repeating-linear-gradient(
+          45deg,
+          rgba(255, 255, 255, 0.04) 0px,
+          rgba(255, 255, 255, 0.04) 2px,
+          transparent 2px,
+          transparent 6px
+        ),
+        linear-gradient(145deg, rgba(224, 108, 74, 0.9) 0%, rgba(15, 26, 43, 0.9) 100%)
+      `,
             borderRadius: 3,
             p: 4,
-            boxShadow: '0 12px 40px rgba(139, 11, 11, 0.4)',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
             width: '100%',
             maxWidth: 450,
             color: 'white',
@@ -126,6 +116,21 @@ export function SignInForm(): React.JSX.Element {
             border: '1px solid rgba(32, 7, 7, 0.15)',
           }}
         >
+          <Box
+            component="img"
+            src="/assets/CCI.png"
+            alt="Logo"
+            sx={{
+              width: 120,
+              height: 110,
+              objectFit: 'contain',
+              display: 'block',
+              mx: 'auto',
+              borderRadius: 1,
+              boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+            }}
+          />
+
           <Typography
             variant="h4"
             sx={{
@@ -137,6 +142,7 @@ export function SignInForm(): React.JSX.Element {
           >
             Iniciar Sesión
           </Typography>
+
           <Divider sx={{ borderColor: 'rgba(255,255,255,0.2)' }} />
 
           <form onSubmit={handleSubmit(onSubmit)}>
@@ -173,7 +179,7 @@ export function SignInForm(): React.JSX.Element {
                       {...field}
                       label="Username"
                     />
-                    {errors.username ? <FormHelperText>{errors.username.message}</FormHelperText> : null}
+                    {errors.username && <FormHelperText>{errors.username.message}</FormHelperText>}
                   </FormControl>
                 )}
               />
@@ -212,28 +218,24 @@ export function SignInForm(): React.JSX.Element {
                           <EyeIcon
                             cursor="pointer"
                             fontSize="var(--icon-fontSize-md)"
-                            onClick={(): void => {
-                              setShowPassword(false);
-                            }}
+                            onClick={() => setShowPassword(false)}
                           />
                         ) : (
                           <EyeSlashIcon
                             cursor="pointer"
                             fontSize="var(--icon-fontSize-md)"
-                            onClick={(): void => {
-                              setShowPassword(true);
-                            }}
+                            onClick={() => setShowPassword(true)}
                           />
                         )
                       }
                       label="Password"
                       type={showPassword ? 'text' : 'password'}
                     />
-                    {errors.password ? <FormHelperText>{errors.password.message}</FormHelperText> : null}
+                    {errors.password && <FormHelperText>{errors.password.message}</FormHelperText>}
                   </FormControl>
                 )}
               />
-              {errors.root ? <Alert color="error">{errors.root.message}</Alert> : null}
+              {errors.root && <Alert color="error">{errors.root.message}</Alert>}
               <Button
                 sx={{
                   background: 'rgba(51,0,27,0.85)',

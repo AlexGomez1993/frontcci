@@ -11,7 +11,7 @@ export function Layout({ children }: LayoutProps): React.JSX.Element {
       sx={{
               minHeight: '100vh',
               width: '100vw',
-              backgroundImage: 'url(/assets/cci-fondo.png)',
+              backgroundImage: 'url(/assets/fondo-cci.jpg)',
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               display: 'flex',

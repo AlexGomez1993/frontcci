@@ -55,8 +55,8 @@ export function SideNav(): React.JSX.Element {
 
   return (
     <Box
-     sx={{
-  background: `
+      sx={{
+        background: `
     repeating-linear-gradient(
       45deg,
       rgba(255, 255, 255, 0.05) 0px,
@@ -66,37 +66,36 @@ export function SideNav(): React.JSX.Element {
     ),
     linear-gradient(
       to bottom,
-      rgba(255, 255, 255, 0.95) 0%,
-      rgba(230, 80, 85, 0.88) 20%,
-      rgba(212, 36, 44, 0.85) 45%,
-      rgba(211, 20, 26, 0.75) 65%,
-      rgba(109, 14, 20, 0.65) 100%
+      rgba(10, 4, 44, 0.95) 0%,
+      rgba(107, 51, 34, 0.64) 20%,
+      rgba(214, 76, 34, 0.85) 45%,
+      rgba(235, 14, 32, 0.75) 65%,
+      rgba(172, 34, 34, 0.65) 100%
     )
   `,
-  '--SideNav-color': 'var(--mui-palette-common-white)',
-  '--NavItem-color': '#f4d9db',
-  '--NavItem-hover-background': 'rgba(255, 255, 255, 0.04)',
-  '--NavItem-active-background': '#d4242c',
-  '--NavItem-active-color': '#ffffff',
-  '--NavItem-disabled-color': '#c58c8f',
-  '--NavItem-icon-color': '#f3b8bc',
-  '--NavItem-icon-active-color': '#ffffff',
-  '--NavItem-icon-disabled-color': '#b37679',
-  bgcolor: 'transparent',
-  color: 'var(--SideNav-color)',
-  display: { xs: 'none', lg: 'flex' },
-  flexDirection: 'column',
-  height: '100%',
-  left: 0,
-  maxWidth: '100%',
-  position: 'fixed',
-  scrollbarWidth: 'none',
-  top: 0,
-  width: 'var(--SideNav-width)',
-  zIndex: 'var(--SideNav-zIndex)',
-  '&::-webkit-scrollbar': { display: 'none' },
-}}
-
+        '--SideNav-color': 'var(--mui-palette-common-white)',
+        '--NavItem-color': '#f4d9db',
+        '--NavItem-hover-background': 'rgba(255, 255, 255, 0.04)',
+        '--NavItem-active-background': ' #1e3353',
+        '--NavItem-active-color': '#ffffff',
+        '--NavItem-disabled-color': '#c58c8f',
+        '--NavItem-icon-color': '#f3b8bc',
+        '--NavItem-icon-active-color': '#ffffff',
+        '--NavItem-icon-disabled-color': '#b37679',
+        bgcolor: 'transparent',
+        color: 'var(--SideNav-color)',
+        display: { xs: 'none', lg: 'flex' },
+        flexDirection: 'column',
+        height: '100%',
+        left: 0,
+        maxWidth: '100%',
+        position: 'fixed',
+        scrollbarWidth: 'none',
+        top: 0,
+        width: 'var(--SideNav-width)',
+        zIndex: 'var(--SideNav-zIndex)',
+        '&::-webkit-scrollbar': { display: 'none' },
+      }}
     >
       <Stack spacing={2} sx={{ p: 3 }}>
         <Box
@@ -124,8 +123,8 @@ export function SideNav(): React.JSX.Element {
         <Box
           sx={{
             alignItems: 'center',
-            backgroundColor: ' #dc3c44',
-            border: '1px solid var(--mui-palette-neutral-700)',
+            backgroundColor: ' #1e3353',
+            border: '1px solid var(--mui-palette-neutral-800)',
             borderRadius: '12px',
             cursor: 'pointer',
             display: 'flex',
@@ -133,7 +132,7 @@ export function SideNav(): React.JSX.Element {
           }}
         >
           <Box sx={{ flex: '1 1 auto' }}>
-            <Typography color="var(--mui-palette-neutral-700)" variant="body2">
+            <Typography color="var(--mui-palette-neutral-400)" variant="body2">
               Usuario
             </Typography>
             <Typography color="inherit" variant="subtitle1">
@@ -143,11 +142,11 @@ export function SideNav(): React.JSX.Element {
           <CaretUpDownIcon />
         </Box>
       </Stack>
-      <Divider sx={{ borderColor: 'var(--mui-palette-neutral-700)' }} />
+      <Divider sx={{ borderColor: 'var(--mui-palette-neutral-800)' }} />
       <Box component="nav" sx={{ flex: '1 1 auto', p: '12px' }}>
         {renderNavItems({ pathname, items: navItems })}
       </Box>
-      <Divider sx={{ borderColor: 'var(--mui-palette-neutral-700)' }} />
+      <Divider sx={{ borderColor: 'var(--mui-palette-neutral-800)' }} />
     </Box>
   );
 }
@@ -189,7 +188,7 @@ function NavItem({ disabled, external, href, icon, matcher, pathname, title }: N
         sx={{
           alignItems: 'center',
           borderRadius: 1,
-          color: 'var(--mui-palette-neutral-700)',
+          color: 'var(--mui-palette-neutral-800)',
           cursor: 'pointer',
           display: 'flex',
           flex: '0 0 auto',
@@ -209,7 +208,7 @@ function NavItem({ disabled, external, href, icon, matcher, pathname, title }: N
         <Box sx={{ alignItems: 'center', display: 'flex', justifyContent: 'center', flex: '0 0 auto' }}>
           {Icon ? (
             <Icon
-              fill={active ? 'var(--mui-palette-neutral-700)' : 'var(--mui-palette-neutral-700)'}
+              fill={active ? 'var(--mui-palette-neutral-400)' : 'var(--mui-palette-neutral-800)'}
               fontSize="var(--icon-fontSize-md)"
               weight={active ? 'fill' : undefined}
             />

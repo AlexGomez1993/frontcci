@@ -108,11 +108,12 @@ export function SignInFormClient(): React.JSX.Element {
   );
 
   return (
+   
     <Box
       sx={{
         minHeight: '100vh',
         width: '100vw',
-        backgroundImage: 'url(/assets/cci-fondo.png)',
+        backgroundImage: 'url(/assets/fondo-cci.jpg)',
         backgroundSize: 'cover',
         backgroundRepeat: 'no-repeat',
         backgroundPosition: 'center',
@@ -125,40 +126,57 @@ export function SignInFormClient(): React.JSX.Element {
         left: 0,
       }}
     >
-       <Box
+      <Stack
+        spacing={3}
+        sx={{
+          background: `
+        repeating-linear-gradient(
+          45deg,
+          rgba(255, 255, 255, 0.07) 0px,
+          rgba(255, 255, 255, 0.04) 2px,
+          transparent 2px,
+          transparent 6px
+        ),
+        linear-gradient(145deg, rgba(224, 109, 74, 0.84) 0%, rgba(15, 26, 43, 0.9) 100%)
+      `,
+          borderRadius: 3,
+          p: 4,
+          boxShadow: '0 12px 40px rgba(139, 11, 11, 0.4)',
+          width: '100%',
+          maxWidth: 450,
+          color: 'white',
+          backdropFilter: 'blur(8px)',
+          border: '1px solid rgba(32, 7, 7, 0.15)',
+          position: 'relative',
+          overflow: 'hidden',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '200%',
+            height: '200%',
+            zIndex: 0,
+            pointerEvents: 'none',
+          },
+        }}
+      >
+        {/* Logo Dentro del Stack */}
+        <Box
           component="img"
           src="/assets/CCI.png"
           alt="Logo"
           sx={{
-            width: 150,
-            height: 160,
-            borderRadius: 2,
-            boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
-            transform: 'translateY(15px)', // Ajuste fino de alineación vertical
-            flexShrink: 0,
-            '@media (max-width: 400px)': {
-              transform: 'translateY(0)',
-              marginBottom: 2,
-              width: 100,
-              height: 140,
-            },
-          }}
+              width: 120,
+              height: 110,
+              objectFit: 'contain',
+              display: 'block',
+              mx: 'auto',
+              borderRadius: 1,
+              boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+            }}
         />
-      <Stack
-        spacing={3}
-       sx={{
-            background: 'linear-gradient(145deg, rgba(209, 39, 48, 0.9) 0%, rgba(119, 14, 20, 0.6) 100%)',
-            borderRadius: 3,
-            p: 4,
-            boxShadow: '0 12px 40px rgba(139, 11, 11, 0.4)',
-            width: '100%',
-            maxWidth: 450,
-            color: 'white',
-            backdropFilter: 'blur(8px)',
-            border: '1px solid rgba(32, 7, 7, 0.15)',
-          }}
-        
-      >
+
         <Typography
           variant="h4"
           sx={{
@@ -166,41 +184,32 @@ export function SignInFormClient(): React.JSX.Element {
             color: 'common.white',
             textAlign: 'center',
             textShadow: '0 2px 4px rgba(0,0,0,0.3)',
+            zIndex: 1,
           }}
         >
           Iniciar Sesión
         </Typography>
-        <Divider sx={{ borderColor: 'rgba(255,255,255,0.2)' }} />
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <Divider sx={{ borderColor: 'rgba(255,255,255,0.2)', zIndex: 1 }} />
+
+        <form onSubmit={handleSubmit(onSubmit)} style={{ zIndex: 1, position: 'relative' }}>
           <Stack spacing={2}>
             <Controller
               control={control}
               name="ruc"
               render={({ field }) => (
                 <FormControl error={Boolean(errors.ruc)}>
-                  <InputLabel sx={{
-                    color: 'white',
-                    '&.Mui-focused': {
-                      color: 'white',
-                    },
-                  }}>C.I. / Pasaporte</InputLabel>
+                  <InputLabel sx={{ color: 'white', '&.Mui-focused': { color: 'white' } }}>C.I. / Pasaporte</InputLabel>
                   <OutlinedInput
                     {...field}
                     label="C.I./ Pasaporte"
                     sx={{
                       color: 'white',
-                      '& .MuiOutlinedInput-notchedOutline': {
-                        borderColor: 'white',
-                      },
-                      '&:hover .MuiOutlinedInput-notchedOutline': {
-                        borderColor: 'white',
-                      },
-                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                        borderColor: 'white',
-                      },
+                      '& .MuiOutlinedInput-notchedOutline': { borderColor: 'white' },
+                      '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'white' },
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: 'white' },
                     }}
                   />
-                  <Typography variant="caption" sx={{ color: 'white)' }}>
+                  <Typography variant="caption" sx={{ color: 'white' }}>
                     * Recuerda si tienes pasaporte anteponer la letra P *
                   </Typography>
                   {errors.ruc && (
@@ -211,74 +220,69 @@ export function SignInFormClient(): React.JSX.Element {
                 </FormControl>
               )}
             />
+
             {!validado && (
-              <Button sx={{
-                background: 'rgba(51,0,27,0.85)',
-                color: 'white',
-                '&:hover': {
-                  background: 'rgba(51,0,27,1)',
-                  boxShadow: '0 4px 15px rgba(51,0,27,0.4)'
-                },
-                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-              }} variant="outlined" onClick={handleValidarRuc} disabled={isPending}>
+              <Button
+                sx={{
+                  background: 'rgba(51,0,27,0.85)',
+                  color: 'white',
+                  '&:hover': {
+                    background: 'rgba(51,0,27,1)',
+                    boxShadow: '0 4px 15px rgba(51,0,27,0.4)',
+                  },
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                }}
+                variant="outlined"
+                onClick={handleValidarRuc}
+                disabled={isPending}
+              >
                 {isPending ? <CircularProgress size={20} /> : 'Siguiente'}
               </Button>
             )}
 
             {(clienteState?.estado === 1 || clienteState?.estado === 3) && (
-              <Controller
-                control={control}
-                name="password"
-                render={({ field }) => (
-                  <FormControl error={Boolean(errors.password)}>
-                    <InputLabel sx={{
-                    color: 'white',
-                    '&.Mui-focused': {
-                      color: 'white',
-                    },
-                  }}>Contraseña</InputLabel>
-                    <OutlinedInput
-                      {...field}
-                      type={showPassword ? 'text' : 'password'}
-                      endAdornment={
-                        showPassword ? (
-                          <Eye onClick={() => setShowPassword(false)} />
-                        ) : (
-                          <EyeSlash onClick={() => setShowPassword(true)} />
-                        )
-                      }
-                      sx={{
-                        color: 'white',
-                        '& .MuiOutlinedInput-notchedOutline': {
-                          borderColor: 'white',
-                        },
-                        '&:hover .MuiOutlinedInput-notchedOutline': {
-                          borderColor: 'white',
-                        },
-                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                          borderColor: 'white',
-                        },
-                      }}
-                    />
-                    {errors.password && (
-                      <Typography variant="caption" color="error">
-                        {errors.password.message}
-                      </Typography>
-                    )}
-                  </FormControl>
-                )}
-              />
-            )}
-
-            {errors.root && <Alert severity="error">{errors.root.message}</Alert>}
-
-            {(clienteState?.estado === 1 || clienteState?.estado === 3) && (
               <>
-                <div>
-                  <Link component={RouterLink} href={paths.auth.resetPassword} variant="subtitle2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                    Olvidaste tu Contraseña?
-                  </Link>
-                </div>
+                <Controller
+                  control={control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormControl error={Boolean(errors.password)}>
+                      <InputLabel sx={{ color: 'white', '&.Mui-focused': { color: 'white' } }}>Contraseña</InputLabel>
+                      <OutlinedInput
+                        {...field}
+                        type={showPassword ? 'text' : 'password'}
+                        endAdornment={
+                          showPassword ? (
+                            <Eye onClick={() => setShowPassword(false)} />
+                          ) : (
+                            <EyeSlash onClick={() => setShowPassword(true)} />
+                          )
+                        }
+                        sx={{
+                          color: 'white',
+                          '& .MuiOutlinedInput-notchedOutline': { borderColor: 'white' },
+                          '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'white' },
+                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: 'white' },
+                        }}
+                      />
+                      {errors.password && (
+                        <Typography variant="caption" color="error">
+                          {errors.password.message}
+                        </Typography>
+                      )}
+                    </FormControl>
+                  )}
+                />
+
+                <Link
+                  component={RouterLink}
+                  href={paths.auth.resetPassword}
+                  variant="subtitle2"
+                  sx={{ color: 'rgba(255,255,255,0.7)' }}
+                >
+                  ¿Olvidaste tu Contraseña?
+                </Link>
+
                 <Button
                   sx={{
                     background: 'rgba(51,0,27,0.85)',
@@ -297,12 +301,15 @@ export function SignInFormClient(): React.JSX.Element {
                 </Button>
               </>
             )}
+
             {clienteState?.estado === 1 && (
               <Alert severity="info">
                 Usted fue registrado en la isla de atención al cliente del centro comercial. Su clave es su número de
                 identificación. Recomendamos cambiarla en el módulo Perfil → Cambiar contraseña.
               </Alert>
             )}
+
+            {errors.root && <Alert severity="error">{errors.root.message}</Alert>}
           </Stack>
         </form>
 
