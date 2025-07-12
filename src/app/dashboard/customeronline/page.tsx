@@ -22,9 +22,10 @@ import {
   styled,
   TextField,
   Typography,
-  DialogContentText,
   useTheme,
   Autocomplete,
+  Snackbar,
+  Alert,
 } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import Pagination from '@mui/material/Pagination';
@@ -207,6 +208,10 @@ const FacturaDialog = ({ open, onClose, onSubmit }: FacturaDialogProps) => {
   const [campanias, setCampanias] = useState<Campaign[]>([]);
   const [formasPago, setFormasPago] = useState<PaymentMethod[]>([]);
   const [locales, setLocales] = useState<Store[]>([]);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMsg, setSnackbarMsg] = useState('');
+  const [snackbarType, setSnackbarType] = useState<'success' | 'error' | 'warning'>('success');
+  const [openDialogValidate, setOpenDialogValidate] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     campania: '',
     local: '',
@@ -310,6 +315,39 @@ const FacturaDialog = ({ open, onClose, onSubmit }: FacturaDialogProps) => {
       }));
     }
   };
+  const handleValidar = async () => {
+    if (!formData.numeroFactura || !formData.local || formData.local == '0') {
+      setSnackbarType('error');
+      setSnackbarMsg('Revise que los campos de local y número de factura esten llenos.');
+      setSnackbarOpen(true);
+      return;
+    }
+
+    try {
+      const response = await axiosClient.post(`/api/facturas/validarFactura`, {
+        numeroFactura: formData.numeroFactura,
+        tienda_id: formData.local
+      });
+
+      if (response.status === 200) {
+        setFormData((prev) => ({ ...prev, numeroFactura: '' }));
+        setOpenDialogValidate(true);
+      }
+    } catch (error: any) {
+      if (error.response && error.response.status === 404) {
+        setSnackbarType('success');
+        setSnackbarMsg('Factura válida. Puedes continuar.');
+        setSnackbarOpen(true);
+      } else {
+        setSnackbarType('error');
+        setSnackbarMsg('Error al validar la factura');
+        setSnackbarOpen(true);
+      }
+    }
+  };
+  const handleCloseDialogValidate = () => {
+    setOpenDialogValidate(false);
+  };
 
   const handleSubmit = async () => {
     const {
@@ -364,6 +402,10 @@ const FacturaDialog = ({ open, onClose, onSubmit }: FacturaDialogProps) => {
 
     onSubmit(processedData);
     //onClose();
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
   };
 
   return (
@@ -425,6 +467,7 @@ const FacturaDialog = ({ open, onClose, onSubmit }: FacturaDialogProps) => {
               value={formData.numeroFactura}
               onChange={handleChange}
               inputProps={{ maxLength: 6 }}
+              onBlur={handleValidar}
               variant="outlined"
               size="small"
             />
@@ -572,6 +615,42 @@ const FacturaDialog = ({ open, onClose, onSubmit }: FacturaDialogProps) => {
           Registrar
         </Button>
       </DialogActions>
+            <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={2000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert onClose={handleSnackbarClose} severity={snackbarType} sx={{ width: '100%' }}>
+          {snackbarMsg}
+        </Alert>
+      </Snackbar>
+      <Dialog open={openDialogValidate} onClose={handleCloseDialogValidate} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ textAlign: 'center', fontSize: '1.25rem', fontWeight: 'bold' }}>
+          Factura Registrada
+        </DialogTitle>
+        <DialogContent sx={{ textAlign: 'center', padding: '16px 24px' }}>
+          <Typography variant="body1" sx={{ fontSize: '1rem', color: '#555', marginBottom: '16px' }}>
+            La factura ya ha sido registrada anteriormente. No se permiten duplicados.
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: 'center' }}>
+          <Button
+            onClick={handleCloseDialogValidate}
+            color="secondary"
+            variant="contained"
+            sx={{
+              padding: '8px 16px',
+              backgroundColor: '#f44336',
+              '&:hover': {
+                backgroundColor: '#d32f2f',
+              },
+            }}
+          >
+            Cerrar
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Dialog>
   );
 };
