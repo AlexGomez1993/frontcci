@@ -37,6 +37,7 @@ import { PlusCircle, TipJar, Trash } from '@phosphor-icons/react';
 import { Store } from '@/types/comercial_store';
 import { CustomerBalance } from '@/types/customerBalance';
 import { useUser } from '@/hooks/use-user';
+import { isCedulaEcuador, isPasaporte, isRucEcuador } from '@/utils/validationCI';
 
 interface Factura {
   local_nombre: string;
@@ -86,6 +87,7 @@ export default function FacturaForm() {
   const [monto, setMonto] = useState('');
   const [facturaNum, setFacturaNum] = useState('');
   const [openDialog, setOpenDialog] = useState(false);
+  const [openDialogValidate, setOpenDialogValidate] = useState(false);
   const [locales, setLocales] = useState<Store[]>([]);
   const [campanias, setCampanias] = useState<Campaign[]>([]);
   const [formasPago, setFormasPago] = useState<PaymentMethod[]>([]);
@@ -93,11 +95,12 @@ export default function FacturaForm() {
   const [indiceCampania, setIndiceCampania] = useState(0);
   const [openCuponDialog, setOpenCuponDialog] = useState(false);
   const [estadoImpresion, setEstadoImpresion] = useState<'listo' | 'imprimiendo' | 'transicion' | 'finalizado'>('listo');
-  const [cuentaRegresiva, setCuentaRegresiva] = useState(5);
+  const [cuentaRegresiva, setCuentaRegresiva] = useState(2);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMsg, setSnackbarMsg] = useState('');
   const [snackbarType, setSnackbarType] = useState<'success' | 'error' | 'warning'>('success');
   const [isEditing, setIsEditing] = useState(false);
+  const [rucError, setRucError] = React.useState('');
   const [cliente, setCliente] = useState<Cliente>({
     id: '',
     nombres: '',
@@ -275,29 +278,20 @@ export default function FacturaForm() {
     const ruc = event.target.value;
     setCliente({ ...cliente, ciRuc: ruc });
 
-    if (ruc.length === 10 || ruc.length === 13) {
-      const clienteData = await obtenerClientePorRuc(ruc);
-      if (clienteData) {
-        setCliente({
-          ...cliente,
-          id: clienteData.id,
-          nombres: clienteData.nombre,
-          apellidos: clienteData.apellidos,
-          email: clienteData.email,
-          direccion: clienteData.direccion,
-          fechaNacimiento: clienteData.fecha_nacimiento,
-          telefono: clienteData.telefono,
-          celular: clienteData.celular,
-          ciRuc: clienteData.ruc,
-          sexo: clienteData.sexo || '',
-          provincia: clienteData.provincia || 'Pichincha',
-          ciudad: clienteData.ciudad || 'Quito',
-        });
-        return;
-      }
-
-      setOpenDialog(true);
+  if (ruc.length >= 6) {
+    const isValid = isCedulaEcuador(ruc) || isRucEcuador(ruc) || isPasaporte(ruc) || ruc=='222222222';
+    if (!isValid) {
+      setRucError('Identificación inválida');
+      return;
+    } else {
+      setRucError('');
     }
+
+    // Busca cliente
+    if (ruc.length === 10 || ruc.length === 13 || ruc.startsWith('P')) {
+      await buscarClientePorIdentificacion(ruc);
+    }
+  }
   };
 
   const actualizarSaldoInicial = (saldoinicial: number, index: number) => {
@@ -571,7 +565,7 @@ export default function FacturaForm() {
       if (i > end) {
         // Fin de campaña actual
         setEstadoImpresion('transicion');
-        setCuentaRegresiva(5);
+        setCuentaRegresiva(2);
 
         const countdown = setInterval(() => {
           setCuentaRegresiva((prev) => {
@@ -687,6 +681,85 @@ export default function FacturaForm() {
     }
   }
 
+  
+  const handleValidar = async () => {
+    if (!facturaNum || !local || local == '0'){
+      setSnackbarType('error');
+      setSnackbarMsg('Revise que los campos de local y número de factura esten llenos.');
+      setSnackbarOpen(true);
+      return;
+    } 
+
+    try {
+      const response = await axiosClient.post(`/api/facturas/validarFactura`, {
+        numeroFactura: facturaNum,
+        tienda_id: local
+      });
+
+      if (response.status === 200) {
+        setFacturaNum('');
+        setOpenDialogValidate(true);
+      }
+    } catch (error: any) {
+      if (error.response && error.response.status === 404) {
+        setSnackbarType('success');
+        setSnackbarMsg('Factura válida. Puedes continuar.');
+        setSnackbarOpen(true);
+      } else {
+        setSnackbarType('error');
+        setSnackbarMsg('Error al validar la factura');
+        setSnackbarOpen(true);
+      }
+    }
+  };
+  const handleCloseDialogValidate = () => {
+    setOpenDialogValidate(false);
+  };
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
+
+  const handleRucKeyDown = async (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      const ruc = (event.target as HTMLInputElement).value;
+
+      const isValid = isCedulaEcuador(ruc) || isRucEcuador(ruc) || isPasaporte(ruc);
+      if (!isValid) {
+        setRucError('Identificación inválida');
+        return;
+      } else {
+        setRucError('');
+      }
+
+      await buscarClientePorIdentificacion(ruc);
+    }
+  };
+  const buscarClientePorIdentificacion = async (identificacion: string) => {
+    
+    if (identificacion.length >= 6) { 
+      const clienteData = await obtenerClientePorRuc(identificacion);
+      if (clienteData) {
+        setCliente({
+          ...cliente,
+          id: clienteData.id,
+          nombres: clienteData.nombre,
+          apellidos: clienteData.apellidos,
+          email: clienteData.email,
+          direccion: clienteData.direccion,
+          fechaNacimiento: clienteData.fecha_nacimiento,
+          telefono: clienteData.telefono,
+          celular: clienteData.celular,
+          ciRuc: clienteData.ruc,
+          sexo: clienteData.sexo || '',
+          provincia: clienteData.provincia || 'Pichincha',
+          ciudad: clienteData.ciudad || 'Quito',
+        });
+        return;
+      }
+
+      setOpenDialog(true);
+    }
+  };
   return (
     <Box sx={{ p: 3 }}>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
@@ -718,7 +791,16 @@ export default function FacturaForm() {
       </Box>
       <Grid container spacing={2}>
         <Grid item xs={12} sm={6}>
-          <TextField fullWidth label="R.U.C." variant="outlined" onChange={handleRucChange} size='small' />
+          <TextField 
+          fullWidth 
+          label="R.U.C." 
+          variant="outlined" 
+          onChange={handleRucChange} 
+          onKeyDown={handleRucKeyDown} 
+          size='small' 
+          error={Boolean(rucError)}
+          helperText={rucError || '* Recuerda si es pasaporte anteponer la letra P *'}
+          />
         </Grid>
         <NewClientDialog openDialog={openDialog} setOpenDialog={setOpenDialog} cliente={cliente} setCliente={setCliente} />
 
@@ -850,7 +932,7 @@ export default function FacturaForm() {
                     <MenuItem value={0}>
                       Seleccione...
                     </MenuItem>
-                    {formasPago.map((fp) => (
+                    {campania?.formaspago?.map((fp) => (
                       <MenuItem key={fp.id} value={fp.id}>
                         {fp.nombre}
                       </MenuItem>
@@ -902,10 +984,12 @@ export default function FacturaForm() {
         <Grid item xs={12} sm={3}>
           <TextField
             fullWidth
-            label="Número de Factura"
+            label="Número de Factura (últimos 6 dígitos)"
             variant="outlined"
             value={facturaNum}
+            inputProps={{ maxLength: 6 }}
             onChange={(e) => setFacturaNum(e.target.value)}
+            onBlur={handleValidar}
             size='small'
           />
         </Grid>
@@ -1090,13 +1174,39 @@ export default function FacturaForm() {
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={2000}
-        onClose={() => setSnackbarOpen(false)}
+        onClose={handleSnackbarClose}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
-        <Alert onClose={() => setSnackbarOpen(false)} severity={snackbarType} sx={{ width: '100%' }}>
+        <Alert onClose={handleSnackbarClose} severity={snackbarType} sx={{ width: '100%' }}>
           {snackbarMsg}
         </Alert>
       </Snackbar>
+      <Dialog open={openDialogValidate} onClose={handleCloseDialogValidate} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ textAlign: 'center', fontSize: '1.25rem', fontWeight: 'bold' }}>
+          Factura Registrada
+        </DialogTitle>
+        <DialogContent sx={{ textAlign: 'center', padding: '16px 24px' }}>
+          <Typography variant="body1" sx={{ fontSize: '1rem', color: '#555', marginBottom: '16px' }}>
+            La factura ya ha sido registrada anteriormente. No se permiten duplicados.
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: 'center' }}>
+          <Button
+            onClick={handleCloseDialogValidate}
+            color="secondary"
+            variant="contained"
+            sx={{
+              padding: '8px 16px',
+              backgroundColor: '#f44336',
+              '&:hover': {
+                backgroundColor: '#d32f2f',
+              },
+            }}
+          >
+            Cerrar
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }
