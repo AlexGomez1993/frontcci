@@ -3,28 +3,18 @@
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  Alert,
-  Box,
-  Button,
-  Container,
-  Divider,
-  Paper,
-  Snackbar,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { Alert, Box, Button, Container, Divider, Paper, Snackbar, TextField, Typography } from '@mui/material';
 import { PencilSimple } from '@phosphor-icons/react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+
 import axiosClient from '@/lib/axiosClient';
 
 const schema = z.object({
   nombres: z.string().min(1, 'El nombre es requerido'),
   apellidos: z.string().min(1, 'El apellido es requerido'),
-  direccion: z.string().min(1, 'La dirección es requerida'),
+  direccion: z.string().min(1, 'El sector es requerido'),
   celular: z.string().min(1, 'El celular es requerido'),
-  telefono: z.string().optional(),
   email: z.string().email('El correo electrónico no es válido').min(1, 'El correo electrónico es obligatorio'),
 });
 
@@ -51,7 +41,6 @@ const ClientEditPage = ({ params }: { params: { id: string } }) => {
       apellidos: '',
       direccion: '',
       celular: '',
-      telefono: '',
       email: '',
     },
   });
@@ -68,7 +57,6 @@ const ClientEditPage = ({ params }: { params: { id: string } }) => {
         setValue('apellidos', data.apellidos);
         setValue('direccion', data.direccion);
         setValue('celular', data.celular);
-        setValue('telefono', data.telefono);
         setValue('email', data.email);
       } catch (err) {
         console.error('Error al obtener el cliente', err);
@@ -155,7 +143,7 @@ const ClientEditPage = ({ params }: { params: { id: string } }) => {
           />
 
           <TextField
-            label="Dirección"
+            label="Sector"
             fullWidth
             margin="normal"
             {...register('direccion')}
@@ -175,16 +163,6 @@ const ClientEditPage = ({ params }: { params: { id: string } }) => {
           />
 
           <TextField
-            label="Teléfono"
-            fullWidth
-            margin="normal"
-            {...register('telefono')}
-            error={!!errors.telefono}
-            helperText={errors.telefono?.message}
-            size="small"
-          />
-
-          <TextField
             label="Email"
             fullWidth
             margin="normal"
@@ -194,29 +172,14 @@ const ClientEditPage = ({ params }: { params: { id: string } }) => {
             size="small"
           />
 
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            fullWidth
-            sx={{ mt: 3 }}
-            disabled={isSubmitting}
-          >
+          <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 3 }} disabled={isSubmitting}>
             Guardar Cambios
           </Button>
         </form>
       </Paper>
 
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={2000}
-        onClose={handleSnackbarClose}
-      >
-        <Alert
-          onClose={() => setSnackbarOpen(false)}
-          severity={snackbarType}
-          sx={{ width: '100%' }}
-        >
+      <Snackbar open={snackbarOpen} autoHideDuration={2000} onClose={handleSnackbarClose}>
+        <Alert onClose={() => setSnackbarOpen(false)} severity={snackbarType} sx={{ width: '100%' }}>
           {snackbarMsg}
         </Alert>
       </Snackbar>

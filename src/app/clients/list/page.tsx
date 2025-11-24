@@ -9,6 +9,7 @@ import {
   CircularProgress,
   Divider,
   FormControl,
+  Grid,
   InputLabel,
   MenuItem,
   Pagination,
@@ -23,13 +24,12 @@ import {
   TableRow,
   TextField,
   Typography,
-  Grid,
 } from '@mui/material';
 import { SelectChangeEvent } from '@mui/material/Select';
-import { Gift, PencilSimple, MagnifyingGlass } from '@phosphor-icons/react';
+import { Gift, MagnifyingGlass, PencilSimple } from '@phosphor-icons/react';
 
+import { Client, ClientResponse } from '@/types/client';
 import axiosClient from '@/lib/axiosClient';
-import { ClientResponse, Client } from '@/types/client';
 
 const ClientsPage = () => {
   const router = useRouter();
@@ -155,7 +155,7 @@ const ClientsPage = () => {
               label="Filtrar por"
             >
               <MenuItem value="ruc">RUC/CI</MenuItem>
-              <MenuItem value="name">Nombre</MenuItem>              
+              <MenuItem value="name">Nombre</MenuItem>
             </Select>
           </FormControl>
         </Grid>
@@ -187,12 +187,7 @@ const ClientsPage = () => {
 
         {/* Botón para borrar los filtros */}
         <Grid item xs={12} sm={2}>
-          <Button
-            variant="outlined"
-            color="secondary"
-            onClick={handleClearFilters}
-            fullWidth
-          >
+          <Button variant="outlined" color="secondary" onClick={handleClearFilters} fullWidth>
             Borrar Filtro
           </Button>
         </Grid>
@@ -223,7 +218,7 @@ const ClientsPage = () => {
                 <TableRow>
                   <TableCell>Nombre</TableCell>
                   <TableCell>CI/RUC</TableCell>
-                  <TableCell>Dirección</TableCell>
+                  <TableCell>Sector</TableCell>
                   <TableCell>Celular</TableCell>
                   <TableCell>Editar</TableCell>
                 </TableRow>
@@ -231,7 +226,9 @@ const ClientsPage = () => {
               <TableBody>
                 {clients.map((client) => (
                   <TableRow key={client.id}>
-                    <TableCell>{client.nombre} {client.apellidos}</TableCell>
+                    <TableCell>
+                      {client.nombre} {client.apellidos}
+                    </TableCell>
                     <TableCell>{client.ruc}</TableCell>
                     <TableCell>{client.direccion}</TableCell>
                     <TableCell>{client.celular}</TableCell>

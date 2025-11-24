@@ -33,12 +33,13 @@ import {
   useTheme,
 } from '@mui/material';
 import { SelectChangeEvent } from '@mui/material/Select';
-import axiosClient from '@/lib/axiosClient';
 import { Invoice } from '@phosphor-icons/react';
-import { useUser } from '@/hooks/use-user';
-import { Store } from '@/types/comercial_store';
 import axios from 'axios';
 import moment from 'moment';
+
+import { Store } from '@/types/comercial_store';
+import axiosClient from '@/lib/axiosClient';
+import { useUser } from '@/hooks/use-user';
 
 interface Factura {
   id: number;
@@ -55,8 +56,8 @@ type Campania = {
   nombre: string;
   promociones: Promocion[];
   configuracion: any;
-  tiendas: Store[]
-  logo?: string
+  tiendas: Store[];
+  logo?: string;
 };
 
 type Promocion = {
@@ -107,7 +108,9 @@ const FacturasTable = () => {
   const [cuponesPorImprimir, setCuponesPorImprimir] = useState<any[]>([]);
   const [indiceCampania, setIndiceCampania] = useState(0);
   const [openCuponDialog, setOpenCuponDialog] = useState(false);
-  const [estadoImpresion, setEstadoImpresion] = useState<'listo' | 'imprimiendo' | 'transicion' | 'finalizado'>('listo');
+  const [estadoImpresion, setEstadoImpresion] = useState<'listo' | 'imprimiendo' | 'transicion' | 'finalizado'>(
+    'listo'
+  );
   const [cuentaRegresiva, setCuentaRegresiva] = useState(2);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -119,22 +122,20 @@ const FacturasTable = () => {
   const fetchFacturas = async () => {
     try {
       setLoading(true);
-      const response = await axiosClient.get(
-        `/api/facturas?estadoFactura=1`, {
+      const response = await axiosClient.get(`/api/facturas?estadoFactura=1`, {
         params: {
           limit: rowsPerPage,
           page: currentPage,
           ruc: filterRuc,
         },
-      }
-      );
+      });
 
       setFacturas(response.data.data || []);
       setTotalPage(response.data.totalPaginas);
       setTotalFacturas(response.data.total);
     } catch (error: any) {
       console.error('Error al cargar facturas:', error);
-      setError(error.message ? error.message : 'Error al cargar facturas')
+      setError(error.message ? error.message : 'Error al cargar facturas');
     } finally {
       setLoading(false);
     }
@@ -142,7 +143,6 @@ const FacturasTable = () => {
   useEffect(() => {
     fetchFacturas();
   }, [currentPage, rowsPerPage, filterRuc]);
-
 
   useEffect(() => {
     const fetchFormasPago = async () => {
@@ -172,7 +172,8 @@ const FacturasTable = () => {
     fetchCampanias();
   }, []);
   const handleProcesarFactura = async () => {
-    if (!facturasAgregadas || facturasAgregadas.length < 1 || !selectedPromocion || !selectedCampania || saldo === null) return;
+    if (!facturasAgregadas || facturasAgregadas.length < 1 || !selectedPromocion || !selectedCampania || saldo === null)
+      return;
 
     try {
       const response = await axiosClient.put(`/api/facturas/procesarFacturaWeb`, {
@@ -204,7 +205,7 @@ const FacturasTable = () => {
       handleFacturaClose();
       setSelectedPromocion(null);
       setSelectedCampania(null);
-      setSaldo(null)
+      setSaldo(null);
     } catch (error) {
       console.error('Error en la solicitud:', error);
       setSnackbarType('error');
@@ -219,7 +220,8 @@ const FacturasTable = () => {
   };
 
   const handleAgregarFactura = () => {
-    if (saldo === null || saldo === undefined || !facturaSeleccionada || !selectedPromocion || !selectedCampania) return;
+    if (saldo === null || saldo === undefined || !facturaSeleccionada || !selectedPromocion || !selectedCampania)
+      return;
     const factor = facturaSeleccionada.formapago.factor;
     const numCuponesLocal = facturaSeleccionada.tienda.numcupones;
     const montoFactura = Number(facturaSeleccionada.monto);
@@ -251,7 +253,6 @@ const FacturasTable = () => {
         nuevoSaldo: nuevoSaldo,
       },
     ]);
-
   };
   const tableHeaderStyles: SxProps = {
     backgroundColor: theme.palette.primary.light,
@@ -302,8 +303,8 @@ const FacturasTable = () => {
       await axiosClient.put('/api/facturas/rechazarFacturaWeb', {
         factura_id: facturaSeleccionada.id,
         observacion: observacion,
-        usuario_id: user?.id
-      })
+        usuario_id: user?.id,
+      });
       setSnackbarType('success');
       setSnackbarMsg('Factura rechazada con éxito');
       fetchFacturas();
@@ -322,10 +323,9 @@ const FacturasTable = () => {
   };
 
   const handleFacturaClose = () => {
-    setOpenFacturaDialog(false)
+    setOpenFacturaDialog(false);
     setFacturasAgregadas([]);
-
-  }
+  };
   const handleAprobarClick = (factura: any) => {
     setFacturaSeleccionada(factura);
     handleCampania(factura.campania_id);
@@ -396,9 +396,8 @@ const FacturasTable = () => {
               <tr><td><strong>FECHA Y HORA:</strong></td><td>${new Date().toLocaleString()}</td></tr>
               <tr><td><strong>CLIENTE:</strong></td><td>${facturaSeleccionada.cliente?.nombre} ${facturaSeleccionada.cliente?.apellidos}</td></tr>
               <tr><td><strong>CI/RUC:</strong></td><td>${facturaSeleccionada.cliente?.ruc}</td></tr>
-              <tr><td><strong>TELÉFONO:</strong></td><td>${facturaSeleccionada.cliente?.telefono}</td></tr>
               <tr><td><strong>CELULAR:</strong></td><td>${facturaSeleccionada.cliente?.celular}</td></tr>
-              <tr><td><strong>DIRECCIÓN:</strong></td><td>${facturaSeleccionada.cliente?.direccion}</td></tr>
+              <tr><td><strong>SECTOR:</strong></td><td>${facturaSeleccionada.cliente?.direccion}</td></tr>
               <tr><td><strong>CAMPAÑA:</strong></td><td>${campaniaActual.campania}</td></tr>
               <tr>
                 <td colspan="2">
@@ -441,13 +440,14 @@ const FacturasTable = () => {
       });
       const saldosCliente = response.data.data;
       if (saldosCliente && saldosCliente.length > 0) {
-        const saldoCamPromo = saldosCliente.find((s: any) => s.campania_id == selectedCampania!.id && s.promocion_id == promocionSeleccionadaId)
+        const saldoCamPromo = saldosCliente.find(
+          (s: any) => s.campania_id == selectedCampania!.id && s.promocion_id == promocionSeleccionadaId
+        );
         if (saldoCamPromo) {
           setSaldo(saldoCamPromo.saldo);
         } else {
           setSaldo(0);
         }
-
       } else {
         setSaldo(0);
       }
@@ -720,7 +720,7 @@ const FacturasTable = () => {
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
-                  label="Dirección"
+                  label="Sector"
                   variant="outlined"
                   value={facturaSeleccionada.cliente?.direccion || ''}
                   disabled
@@ -922,7 +922,11 @@ const FacturasTable = () => {
         <DialogTitle>{cuponesPorImprimir[indiceCampania]?.campania}</DialogTitle>
         <DialogContent>
           <Typography variant="body1" gutterBottom>
-            Cupones a entregar: <strong>{cuponesPorImprimir[indiceCampania]?.ultimoCuponImprimir - cuponesPorImprimir[indiceCampania]?.ultimoCuponImpreso}</strong>
+            Cupones a entregar:{' '}
+            <strong>
+              {cuponesPorImprimir[indiceCampania]?.ultimoCuponImprimir -
+                cuponesPorImprimir[indiceCampania]?.ultimoCuponImpreso}
+            </strong>
           </Typography>
         </DialogContent>
         <DialogActions>
@@ -939,8 +943,8 @@ const FacturasTable = () => {
 
           {estadoImpresion === 'transicion' && (
             <Typography variant="body2" sx={{ m: 2 }}>
-              Imprimiendo campaña <strong>{cuponesPorImprimir[indiceCampania]?.campania}</strong>...
-              Esperando próxima en {cuentaRegresiva} segundos
+              Imprimiendo campaña <strong>{cuponesPorImprimir[indiceCampania]?.campania}</strong>... Esperando próxima
+              en {cuentaRegresiva} segundos
             </Typography>
           )}
 

@@ -36,26 +36,10 @@ const clienteSchema = z.object({
   email: z.string().email('Correo inválido').optional(),
   direccion: z.string().min(1, 'Requerido'),
   fechaNacimiento: z.string().min(1, 'Requerido'),
-  sexo: z.union([z.literal(1), z.literal(2)]),
-  telefono: z.string().optional(),
   celular: z.string().min(1, 'Requerido'),
-  provincia: z.string().min(1),
-  ciudad: z.string().min(1),
 });
 
-interface Provincia {
-  id: string;
-  nombre: string;
-}
-
-interface Ciudad {
-  id: string;
-  nombre: string;
-}
-
 export const NewClientDialog = ({ openDialog, setOpenDialog, cliente, setCliente }: NewClientProps) => {
-  const [provincias, setProvincias] = useState<Provincia[]>([]);
-  const [ciudades, setCiudades] = useState<Ciudad[]>([]);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMsg, setSnackbarMsg] = useState('');
   const [snackbarType, setSnackbarType] = useState<'success' | 'error' | 'warning'>('success');
@@ -73,11 +57,7 @@ export const NewClientDialog = ({ openDialog, setOpenDialog, cliente, setCliente
       email: '',
       direccion: '',
       fechaNacimiento: '',
-      sexo: 1,
-      telefono: '',
       celular: '',
-      provincia: '19',
-      ciudad: '189',
       id: '',
     },
   });
@@ -85,29 +65,10 @@ export const NewClientDialog = ({ openDialog, setOpenDialog, cliente, setCliente
     if (cliente) {
       reset({
         ciRuc: cliente.ciRuc || '',
-        provincia: '19',
-        ciudad: '189',
       });
     }
   }, [cliente, reset]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [provRes, ciudadRes] = await Promise.all([
-          axiosClient.get('/api/provincias'),
-          axiosClient.get('/api/ciudades'),
-        ]);
-
-        setProvincias(provRes.data);
-        setCiudades(ciudadRes.data);
-      } catch (err) {
-        console.error('Error cargando provincias o ciudades:', err);
-      }
-    };
-
-    fetchData();
-  }, []);
   const calcularEdad = (fecha: string): number => {
     const nacimiento = new Date(fecha);
     const hoy = new Date();
@@ -126,11 +87,11 @@ export const NewClientDialog = ({ openDialog, setOpenDialog, cliente, setCliente
         email: data.email || 'pruebas@smo.ec',
         direccion: data.direccion,
         fecha_nacimiento: data.fechaNacimiento,
-        telefono: data.telefono || '022222222',
+        telefono: '022222222',
         celular: data.celular,
-        ciudad_id: data.ciudad,
-        provincia_id: data.provincia,
-        sexo: data.sexo,
+        ciudad_id: 189,
+        provincia_id: 19,
+        sexo: 1,
         edad: calcularEdad(data.fechaNacimiento),
       });
 
@@ -220,7 +181,7 @@ export const NewClientDialog = ({ openDialog, setOpenDialog, cliente, setCliente
               render={({ field }) => (
                 <TextField
                   {...field}
-                  label="Dirección/Sector"
+                  label="Sector"
                   fullWidth
                   size="small"
                   error={!!errors.direccion}
@@ -249,37 +210,6 @@ export const NewClientDialog = ({ openDialog, setOpenDialog, cliente, setCliente
           </Grid>
           <Grid item xs={12} sm={6}>
             <Controller
-              name="sexo"
-              control={control}
-              render={({ field }) => (
-                <FormControl fullWidth size="small" error={!!errors.sexo}>
-                  <InputLabel id="sexo-label">Sexo</InputLabel>
-                  <Select {...field} labelId="sexo-label" label="Sexo">
-                    <MenuItem value={1}>Masculino</MenuItem>
-                    <MenuItem value={2}>Femenino</MenuItem>
-                  </Select>
-                </FormControl>
-              )}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Controller
-              name="telefono"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  label="Teléfono"
-                  fullWidth
-                  size="small"
-                  error={!!errors.telefono}
-                  helperText={errors.telefono?.message}
-                />
-              )}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Controller
               name="celular"
               control={control}
               render={({ field }) => (
@@ -291,42 +221,6 @@ export const NewClientDialog = ({ openDialog, setOpenDialog, cliente, setCliente
                   error={!!errors.celular}
                   helperText={errors.celular?.message}
                 />
-              )}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Controller
-              name="provincia"
-              control={control}
-              render={({ field }) => (
-                <FormControl fullWidth size="small">
-                  <InputLabel id="provincia-label">Provincia</InputLabel>
-                  <Select {...field} labelId="provincia-label" label="Provincia">
-                    {provincias.map((prov) => (
-                      <MenuItem key={prov.id} value={prov.id}>
-                        {prov.nombre}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              )}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Controller
-              name="ciudad"
-              control={control}
-              render={({ field }) => (
-                <FormControl fullWidth size="small">
-                  <InputLabel id="ciudad-label">Ciudad</InputLabel>
-                  <Select {...field} labelId="ciudad-label" label="Ciudad">
-                    {ciudades.map((ciudad) => (
-                      <MenuItem key={ciudad.id} value={ciudad.id}>
-                        {ciudad.nombre}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
               )}
             />
           </Grid>

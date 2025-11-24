@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { isCedulaEcuador, isPasaporte, isRucEcuador } from '@/utils/validationCI';
 import {
   Alert,
   Autocomplete,
@@ -28,16 +29,16 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import { NewClientDialog } from '@/components/dashboard/customer/newClientDialog';
-import axiosClient from '@/lib/axiosClient';
-import { PaymentMethod, PaymentMethodResponse } from '@/types/payment_method';
-import { Campaign, CampaignPromotions, CampaignResponse } from '@/types/campaign';
-import { CustomerInvoice, Invoice } from '@/types/invoice';
 import { PlusCircle, TipJar, Trash } from '@phosphor-icons/react';
+
+import { Campaign, CampaignPromotions, CampaignResponse } from '@/types/campaign';
 import { Store } from '@/types/comercial_store';
 import { CustomerBalance } from '@/types/customerBalance';
+import { CustomerInvoice, Invoice } from '@/types/invoice';
+import { PaymentMethod, PaymentMethodResponse } from '@/types/payment_method';
+import axiosClient from '@/lib/axiosClient';
 import { useUser } from '@/hooks/use-user';
-import { isCedulaEcuador, isPasaporte, isRucEcuador } from '@/utils/validationCI';
+import { NewClientDialog } from '@/components/dashboard/customer/newClientDialog';
 
 interface Factura {
   local_nombre: string;
@@ -94,7 +95,9 @@ export default function FacturaForm() {
   const [cuponesPorImprimir, setCuponesPorImprimir] = useState<any[]>([]);
   const [indiceCampania, setIndiceCampania] = useState(0);
   const [openCuponDialog, setOpenCuponDialog] = useState(false);
-  const [estadoImpresion, setEstadoImpresion] = useState<'listo' | 'imprimiendo' | 'transicion' | 'finalizado'>('listo');
+  const [estadoImpresion, setEstadoImpresion] = useState<'listo' | 'imprimiendo' | 'transicion' | 'finalizado'>(
+    'listo'
+  );
   const [cuentaRegresiva, setCuentaRegresiva] = useState(2);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMsg, setSnackbarMsg] = useState('');
@@ -136,7 +139,7 @@ export default function FacturaForm() {
         const response = await axiosClient.get<CampaignResponse>(`/api/campanias?activo=1`);
         const campaniasActivas: Campaign[] = response.data.data;
         setCampanias(response.data.data || []);
-        setLocales(campaniasActivas[0].tiendas || [])
+        setLocales(campaniasActivas[0].tiendas || []);
       } catch (error) {
         console.error('Error al cargar campañas:', error);
       }
@@ -156,7 +159,7 @@ export default function FacturaForm() {
           promocion_nombre: campanias[0].promociones ? campanias[0].promociones[0].nombre : '',
           promocion_montominimo: campanias[0].promociones ? campanias[0].promociones[0].montominimo : 0,
           forma_pago: 0,
-        }
+        },
       ]);
     } else {
       setSelectedRows([]);
@@ -166,7 +169,7 @@ export default function FacturaForm() {
   const handleGuardar = async () => {
     try {
       if (!facturasIngreso || !facturasIngreso.campanias.length) {
-        console.warn("No hay facturas para enviar.");
+        console.warn('No hay facturas para enviar.');
         setSnackbarType('warning');
         setSnackbarMsg('Por favor, agrege una factura');
         setSnackbarOpen(true);
@@ -195,16 +198,15 @@ export default function FacturaForm() {
           campanias: [],
         });
       } else {
-        console.error("Error al enviar facturas:", response.status, response.data);
+        console.error('Error al enviar facturas:', response.status, response.data);
       }
-
     } catch (error: any) {
-      console.error("Error en la solicitud:", error?.response?.data || error.message);
+      console.error('Error en la solicitud:', error?.response?.data || error.message);
     }
   };
 
   const handleCampaignChange = (index: number, campaignId: number | string) => {
-    const campania: Campaign | undefined = campanias.find(c => c.id === campaignId);
+    const campania: Campaign | undefined = campanias.find((c) => c.id === campaignId);
     const primeraPromo = campania ? campania.promociones![0] : undefined;
     const newRows = [...selectedRows];
     newRows[index] = {
@@ -219,15 +221,15 @@ export default function FacturaForm() {
   };
   const handlePromotionChange = (index: number, promocionId: number | string) => {
     const row = selectedRows[index];
-    const campania = campanias.find(c => c.id == row.campania_id);
-    const promocion = campania?.promociones?.find(p => p.id == promocionId);
+    const campania = campanias.find((c) => c.id == row.campania_id);
+    const promocion = campania?.promociones?.find((p) => p.id == promocionId);
 
     const newRows = [...selectedRows];
     newRows[index] = {
       ...row,
       promocion_id: promocion?.id,
       promocion_nombre: promocion?.nombre,
-      promocion_montominimo: promocion?.montominimo
+      promocion_montominimo: promocion?.montominimo,
     };
     setSelectedRows(newRows);
   };
@@ -237,7 +239,7 @@ export default function FacturaForm() {
     const newRows = [...selectedRows];
     newRows[index] = {
       ...row,
-      forma_pago: formaPagoId
+      forma_pago: formaPagoId,
     };
     setSelectedRows(newRows);
   };
@@ -251,8 +253,8 @@ export default function FacturaForm() {
         promocion_id: undefined,
         promocion_nombre: '',
         promocion_montominimo: 0,
-        forma_pago: 0
-      }
+        forma_pago: 0,
+      },
     ]);
   };
 
@@ -278,20 +280,20 @@ export default function FacturaForm() {
     const ruc = event.target.value;
     setCliente({ ...cliente, ciRuc: ruc });
 
-  if (ruc.length >= 6) {
-    const isValid = isCedulaEcuador(ruc) || isRucEcuador(ruc) || isPasaporte(ruc) || ruc=='222222222';
-    if (!isValid) {
-      setRucError('Identificación inválida');
-      return;
-    } else {
-      setRucError('');
-    }
+    if (ruc.length >= 6) {
+      const isValid = isCedulaEcuador(ruc) || isRucEcuador(ruc) || isPasaporte(ruc) || ruc == '222222222';
+      if (!isValid) {
+        setRucError('Identificación inválida');
+        return;
+      } else {
+        setRucError('');
+      }
 
-    // Busca cliente
-    if (ruc.length === 10 || ruc.length === 13 || ruc.startsWith('P')) {
-      await buscarClientePorIdentificacion(ruc);
+      // Busca cliente
+      if (ruc.length === 10 || ruc.length === 13 || ruc.startsWith('P')) {
+        await buscarClientePorIdentificacion(ruc);
+      }
     }
-  }
   };
 
   const actualizarSaldoInicial = (saldoinicial: number, index: number) => {
@@ -299,28 +301,28 @@ export default function FacturaForm() {
     const newRows = [...selectedRows];
     newRows[index] = {
       ...row,
-      saldo_inicial: saldoinicial.toString()
+      saldo_inicial: saldoinicial.toString(),
     };
     setSelectedRows(newRows);
-  }
+  };
   const actualizarSaldo = (nuevoSaldo: number, index: number) => {
     const row = selectedRows[index];
     const newRows = [...selectedRows];
     newRows[index] = {
       ...row,
-      saldo_nuevo: nuevoSaldo.toString()
+      saldo_nuevo: nuevoSaldo.toString(),
     };
     setSelectedRows(newRows);
-  }
+  };
   const actualizarCupones = (nuevosCupones: number, index: number) => {
     const row = selectedRows[index];
     const newRows = [...selectedRows];
     newRows[index] = {
       ...row,
-      total_cupones: nuevosCupones
+      total_cupones: nuevosCupones,
     };
     setSelectedRows(newRows);
-  }
+  };
   const obtenerSaldoInicialPromocion = async (
     facturasIngreso: CustomerInvoice,
     cliente_id: number,
@@ -349,8 +351,7 @@ export default function FacturaForm() {
     });
 
     const saldoInicialCliente = response.data.data.find(
-      (saldo: CustomerBalance) =>
-        saldo.campania_id === campania_id && saldo.promocion_id === promocion_id
+      (saldo: CustomerBalance) => saldo.campania_id === campania_id && saldo.promocion_id === promocion_id
     );
 
     const saldo = saldoInicialCliente ? parseFloat(saldoInicialCliente.saldo) : 0;
@@ -464,8 +465,8 @@ export default function FacturaForm() {
           id: c.promocion_id!,
           nombre: c.promocion_nombre!,
           montominimo: c.promocion_montominimo!.toString(),
-          nuevoSaldo: "0",
-          saldoInicial: "0",
+          nuevoSaldo: '0',
+          saldoInicial: '0',
           facturas: [],
         };
         campania.promociones.push(promocion);
@@ -483,11 +484,7 @@ export default function FacturaForm() {
     setLocal('0');
   };
 
-  const eliminarFactura = (
-    campaniaId: number,
-    promocionId: number,
-    facturaIndex: number
-  ) => {
+  const eliminarFactura = (campaniaId: number, promocionId: number, facturaIndex: number) => {
     const nuevaFacturas = { ...facturasIngreso };
 
     const campania = nuevaFacturas.campanias.find((c) => c.id === campaniaId);
@@ -495,16 +492,13 @@ export default function FacturaForm() {
 
     const promocion = campania.promociones.find((p) => p.id === promocionId);
     if (!promocion) return;
-    const saldoGuardado = parseFloat(promocion.nuevoSaldo || "0");
+    const saldoGuardado = parseFloat(promocion.nuevoSaldo || '0');
     const facturaEliminadaDatos = promocion.facturas[facturaIndex];
     // Eliminar la factura
     promocion.facturas.splice(facturaIndex, 1);
 
     // Recalcular total de cupones
-    const totalCupones = promocion.facturas.reduce(
-      (sum, f) => sum + f.numcupones,
-      0
-    );
+    const totalCupones = promocion.facturas.reduce((sum, f) => sum + f.numcupones, 0);
     campania.totalcupones = campania.promociones.reduce(
       (sum, p) => sum + p.facturas.reduce((s, f) => s + f.numcupones, 0),
       0
@@ -513,39 +507,32 @@ export default function FacturaForm() {
     // Recalcular nuevoSaldo si aún hay facturas
     if (promocion.facturas.length > 0) {
       const montominimo = parseFloat(promocion.montominimo);
-      const totalMonto = promocion.facturas.reduce(
-        (sum, f) => sum + parseFloat(f.monto),
-        0
-      );
+      const totalMonto = promocion.facturas.reduce((sum, f) => sum + parseFloat(f.monto), 0);
       const local = locales.find((l) => l.id == facturaEliminadaDatos.tienda_id);
       const cuponPorLocal = parseInt(local!.numcupones) || 1;
-      const formaPago = formasPago.find(
-        (fp) => fp.id == facturaEliminadaDatos.formapago_id
-      );
+      const formaPago = formasPago.find((fp) => fp.id == facturaEliminadaDatos.formapago_id);
       const factor = formaPago?.factor || 1;
 
       // Recalcular saldo restante (solo si la campaña es tipo 1)
       if (campania.tipo_configuracion === 1) {
         const saldoCalculado =
-          (facturaEliminadaDatos.numcupones / (factor * cuponPorLocal)) * montominimo + saldoGuardado - parseFloat(facturaEliminadaDatos.monto);
+          (facturaEliminadaDatos.numcupones / (factor * cuponPorLocal)) * montominimo +
+          saldoGuardado -
+          parseFloat(facturaEliminadaDatos.monto);
 
         promocion.nuevoSaldo = saldoCalculado.toFixed(2);
         const saldoAntiguo = promocion.saldoInicial;
-        const nuevoSaldoAntiguo = parseFloat(saldoAntiguo) - (parseFloat(facturaEliminadaDatos.monto) % montominimo)
+        const nuevoSaldoAntiguo = parseFloat(saldoAntiguo) - (parseFloat(facturaEliminadaDatos.monto) % montominimo);
         promocion.saldoInicial = nuevoSaldoAntiguo.toFixed(2);
       }
     } else {
       // Si no hay facturas, quitar la promoción
-      campania.promociones = campania.promociones.filter(
-        (p) => p.id !== promocionId
-      );
+      campania.promociones = campania.promociones.filter((p) => p.id !== promocionId);
     }
 
     // Si no hay promociones, quitar la campaña
     if (campania.promociones.length === 0) {
-      nuevaFacturas.campanias = nuevaFacturas.campanias.filter(
-        (c) => c.id !== campaniaId
-      );
+      nuevaFacturas.campanias = nuevaFacturas.campanias.filter((c) => c.id !== campaniaId);
     }
 
     setFacturasIngreso(nuevaFacturas);
@@ -615,9 +602,8 @@ export default function FacturaForm() {
               <tr><td><strong>FECHA Y HORA:</strong></td><td>${new Date().toLocaleString()}</td></tr>
               <tr><td><strong>CLIENTE:</strong></td><td>${cliente?.nombres} ${cliente?.apellidos}</td></tr>
               <tr><td><strong>CI/RUC:</strong></td><td>${cliente?.ciRuc}</td></tr>
-              <tr><td><strong>TELÉFONO:</strong></td><td>${cliente?.telefono}</td></tr>
               <tr><td><strong>CELULAR:</strong></td><td>${cliente?.celular}</td></tr>
-              <tr><td><strong>DIRECCIÓN:</strong></td><td>${cliente?.direccion}</td></tr>
+              <tr><td><strong>SECTOR:</strong></td><td>${cliente?.direccion}</td></tr>
               <tr><td><strong>CAMPAÑA:</strong></td><td>${campaniaActual.campania}</td></tr>
               <tr>
                 <td colspan="2">
@@ -657,7 +643,7 @@ export default function FacturaForm() {
         apellidos: cliente.apellidos,
         email: cliente.email,
         direccion: cliente.direccion,
-        celular: cliente.celular
+        celular: cliente.celular,
       });
 
       setSnackbarType('success');
@@ -673,27 +659,27 @@ export default function FacturaForm() {
   };
 
   const handleEnableEdit = () => {
-    if (cliente.id) { setIsEditing(true) }
-    else {
+    if (cliente.id) {
+      setIsEditing(true);
+    } else {
       setSnackbarType('warning');
       setSnackbarMsg('Primero debe ingresar el número de identidad de un cliente.');
       setSnackbarOpen(true);
     }
-  }
+  };
 
-  
   const handleValidar = async () => {
-    if (!facturaNum || !local || local == '0'){
+    if (!facturaNum || !local || local == '0') {
       setSnackbarType('error');
       setSnackbarMsg('Revise que los campos de local y número de factura esten llenos.');
       setSnackbarOpen(true);
       return;
-    } 
+    }
 
     try {
       const response = await axiosClient.post(`/api/facturas/validarFactura`, {
         numeroFactura: facturaNum,
-        tienda_id: local
+        tienda_id: local,
       });
 
       if (response.status === 200) {
@@ -735,8 +721,7 @@ export default function FacturaForm() {
     }
   };
   const buscarClientePorIdentificacion = async (identificacion: string) => {
-    
-    if (identificacion.length >= 6) { 
+    if (identificacion.length >= 6) {
       const clienteData = await obtenerClientePorRuc(identificacion);
       if (clienteData) {
         setCliente({
@@ -791,18 +776,23 @@ export default function FacturaForm() {
       </Box>
       <Grid container spacing={2}>
         <Grid item xs={12} sm={6}>
-          <TextField 
-          fullWidth 
-          label="R.U.C." 
-          variant="outlined" 
-          onChange={handleRucChange} 
-          onKeyDown={handleRucKeyDown} 
-          size='small' 
-          error={Boolean(rucError)}
-          helperText={rucError || '* Recuerda si es pasaporte anteponer la letra P *'}
+          <TextField
+            fullWidth
+            label="R.U.C."
+            variant="outlined"
+            onChange={handleRucChange}
+            onKeyDown={handleRucKeyDown}
+            size="small"
+            error={Boolean(rucError)}
+            helperText={rucError || '* Recuerda si es pasaporte anteponer la letra P *'}
           />
         </Grid>
-        <NewClientDialog openDialog={openDialog} setOpenDialog={setOpenDialog} cliente={cliente} setCliente={setCliente} />
+        <NewClientDialog
+          openDialog={openDialog}
+          setOpenDialog={setOpenDialog}
+          cliente={cliente}
+          setCliente={setCliente}
+        />
 
         <Grid item xs={12} sm={3}>
           <TextField
@@ -811,7 +801,7 @@ export default function FacturaForm() {
             variant="outlined"
             value={cliente.nombres}
             onChange={(e) => setCliente({ ...cliente, nombres: e.target.value })}
-            size='small'
+            size="small"
             disabled={!isEditing}
           />
         </Grid>
@@ -823,7 +813,7 @@ export default function FacturaForm() {
             variant="outlined"
             value={cliente.apellidos}
             onChange={(e) => setCliente({ ...cliente, apellidos: e.target.value })}
-            size='small'
+            size="small"
             disabled={!isEditing}
           />
         </Grid>
@@ -836,7 +826,7 @@ export default function FacturaForm() {
             variant="outlined"
             value={cliente.email}
             onChange={(e) => setCliente({ ...cliente, email: e.target.value })}
-            size='small'
+            size="small"
             disabled={!isEditing}
           />
         </Grid>
@@ -848,7 +838,7 @@ export default function FacturaForm() {
             variant="outlined"
             value={cliente.celular}
             onChange={(e) => setCliente({ ...cliente, celular: e.target.value })}
-            size='small'
+            size="small"
             disabled={!isEditing}
           />
         </Grid>
@@ -856,11 +846,11 @@ export default function FacturaForm() {
         <Grid item xs={12} sm={4}>
           <TextField
             fullWidth
-            label="Dirección"
+            label="Sector"
             variant="outlined"
             value={cliente.direccion}
             onChange={(e) => setCliente({ ...cliente, direccion: e.target.value })}
-            size='small'
+            size="small"
             disabled={!isEditing}
           />
         </Grid>
@@ -929,9 +919,7 @@ export default function FacturaForm() {
                     label="Forma de Pago"
                     size="small"
                   >
-                    <MenuItem value={0}>
-                      Seleccione...
-                    </MenuItem>
+                    <MenuItem value={0}>Seleccione...</MenuItem>
                     {campania?.formaspago?.map((fp) => (
                       <MenuItem key={fp.id} value={fp.id}>
                         {fp.nombre}
@@ -943,22 +931,14 @@ export default function FacturaForm() {
 
               <Grid item xs="auto">
                 <Tooltip title="Eliminar campaña">
-                  <IconButton
-                    onClick={() => removeRow(index)}
-                    color="error"
-                    size="small"
-                  >
+                  <IconButton onClick={() => removeRow(index)} color="error" size="small">
                     <Trash size={20} />
                   </IconButton>
                 </Tooltip>
               </Grid>
               <Grid item xs="auto">
                 <Tooltip title="Agregar Campaña">
-                  <IconButton
-                    onClick={() => addRow()}
-                    color="secondary"
-                    size="small"
-                  >
+                  <IconButton onClick={() => addRow()} color="secondary" size="small">
                     <PlusCircle size={20} />
                   </IconButton>
                 </Tooltip>
@@ -974,9 +954,7 @@ export default function FacturaForm() {
               isOptionEqualToValue={(option, value) => option?.id === value?.id}
               onChange={(event, newValue) => setLocal(newValue?.id?.toString() || '0')}
               value={locales.find((loc) => loc.id.toString() === local) || null}
-              renderInput={(params) => (
-                <TextField {...params} label="Local" size="small" variant="outlined" />
-              )}
+              renderInput={(params) => <TextField {...params} label="Local" size="small" variant="outlined" />}
             />
           </FormControl>
         </Grid>
@@ -990,7 +968,7 @@ export default function FacturaForm() {
             inputProps={{ maxLength: 6 }}
             onChange={(e) => setFacturaNum(e.target.value)}
             onBlur={handleValidar}
-            size='small'
+            size="small"
           />
         </Grid>
         <Grid item xs={12} sm={3}>
@@ -1002,10 +980,10 @@ export default function FacturaForm() {
             value={monto}
             onChange={(e) => {
               let valor = e.target.value;
-              valor = valor.replace(",", ".");
+              valor = valor.replace(',', '.');
 
               // Permitir solo números con un punto y máximo 2 decimales
-              if (/^\d*\.?\d{0,2}$/.test(valor) || valor === "") {
+              if (/^\d*\.?\d{0,2}$/.test(valor) || valor === '') {
                 setMonto(valor);
               }
             }}
@@ -1014,7 +992,7 @@ export default function FacturaForm() {
           />
         </Grid>
         <Grid item xs={12} sm={3}>
-          <Button fullWidth variant="contained" onClick={agregarFactura} size='small'>
+          <Button fullWidth variant="contained" onClick={agregarFactura} size="small">
             + AGREGAR
           </Button>
         </Grid>
@@ -1051,9 +1029,7 @@ export default function FacturaForm() {
                       <Button
                         variant="contained"
                         color="error"
-                        onClick={() =>
-                          eliminarFactura(campania.id, promocion.id, index)
-                        }
+                        onClick={() => eliminarFactura(campania.id, promocion.id, index)}
                       >
                         Eliminar
                       </Button>
@@ -1063,7 +1039,6 @@ export default function FacturaForm() {
               ])
             )}
           </TableBody>
-
         </Table>
       </TableContainer>
       <TableContainer component={Paper} sx={{ mt: 3, border: '2px solid red' }}>
@@ -1088,7 +1063,6 @@ export default function FacturaForm() {
                 </TableRow>
 
                 {campania.promociones.map((promocion, iPromo) => {
-
                   const totalCuponesPromocion = promocion.facturas.reduce(
                     (total: number, factura: any) => total + factura.numcupones,
                     0
@@ -1113,14 +1087,20 @@ export default function FacturaForm() {
         <Button
           variant="contained"
           sx={{ mr: 1 }}
-          onClick={() => { window.location.reload(); }}>
+          onClick={() => {
+            window.location.reload();
+          }}
+        >
           Cancelar
         </Button>
         <Button
           variant="contained"
           color="primary"
           sx={{ mr: 1 }}
-          onClick={() => { window.location.reload(); }}>
+          onClick={() => {
+            window.location.reload();
+          }}
+        >
           Nuevo
         </Button>
         <Button variant="contained" color="success" onClick={handleGuardar}>
@@ -1131,7 +1111,11 @@ export default function FacturaForm() {
         <DialogTitle>{cuponesPorImprimir[indiceCampania]?.campania}</DialogTitle>
         <DialogContent>
           <Typography variant="body1" gutterBottom>
-            Cupones a entregar: <strong>{cuponesPorImprimir[indiceCampania]?.ultimoCuponImprimir - cuponesPorImprimir[indiceCampania]?.ultimoCuponImpreso}</strong>
+            Cupones a entregar:{' '}
+            <strong>
+              {cuponesPorImprimir[indiceCampania]?.ultimoCuponImprimir -
+                cuponesPorImprimir[indiceCampania]?.ultimoCuponImpreso}
+            </strong>
           </Typography>
         </DialogContent>
         <DialogActions>
@@ -1148,8 +1132,8 @@ export default function FacturaForm() {
 
           {estadoImpresion === 'transicion' && (
             <Typography variant="body2" sx={{ m: 2 }}>
-              Imprimiendo campaña <strong>{cuponesPorImprimir[indiceCampania]?.campania}</strong>...
-              Esperando próxima en {cuentaRegresiva} segundos
+              Imprimiendo campaña <strong>{cuponesPorImprimir[indiceCampania]?.campania}</strong>... Esperando próxima
+              en {cuentaRegresiva} segundos
             </Typography>
           )}
 
