@@ -1,11 +1,26 @@
-import { Dialog, DialogTitle, DialogContent, TextField, FormControl, InputLabel, Select, MenuItem, DialogActions, Button, Grid, Box, Snackbar, Alert } from '@mui/material'
-import React from 'react'
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Cliente } from '@/app/dashboard/customers/page';
-import axiosClient from '@/lib/axiosClient';
-import { z } from 'zod';
-import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import {
+  Alert,
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormControl,
+  Grid,
+  InputLabel,
+  MenuItem,
+  Select,
+  Snackbar,
+  TextField,
+} from '@mui/material';
+import { Controller, useForm } from 'react-hook-form';
+import { z } from 'zod';
+
+import axiosClient from '@/lib/axiosClient';
 
 interface NewClientProps {
   openDialog: boolean;
@@ -19,7 +34,7 @@ const clienteSchema = z.object({
   apellidos: z.string().min(1, 'Requerido'),
   ciRuc: z.string().min(1),
   email: z.string().email('Correo inválido').optional(),
-  direccion: z.string().optional(),
+  direccion: z.string().min(1, 'Requerido'),
   fechaNacimiento: z.string().min(1, 'Requerido'),
   sexo: z.union([z.literal(1), z.literal(2)]),
   telefono: z.string().optional(),
@@ -44,7 +59,12 @@ export const NewClientDialog = ({ openDialog, setOpenDialog, cliente, setCliente
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMsg, setSnackbarMsg] = useState('');
   const [snackbarType, setSnackbarType] = useState<'success' | 'error' | 'warning'>('success');
-  const { control, handleSubmit, reset, formState: { errors } } = useForm<Cliente>({
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<Cliente>({
     resolver: zodResolver(clienteSchema),
     defaultValues: {
       nombres: '',
@@ -58,8 +78,8 @@ export const NewClientDialog = ({ openDialog, setOpenDialog, cliente, setCliente
       celular: '',
       provincia: '19',
       ciudad: '189',
-      id: ''
-    }
+      id: '',
+    },
   });
   useEffect(() => {
     if (cliente) {
@@ -77,7 +97,6 @@ export const NewClientDialog = ({ openDialog, setOpenDialog, cliente, setCliente
         const [provRes, ciudadRes] = await Promise.all([
           axiosClient.get('/api/provincias'),
           axiosClient.get('/api/ciudades'),
-
         ]);
 
         setProvincias(provRes.data);
@@ -107,7 +126,7 @@ export const NewClientDialog = ({ openDialog, setOpenDialog, cliente, setCliente
         email: data.email || 'pruebas@smo.ec',
         direccion: data.direccion,
         fecha_nacimiento: data.fechaNacimiento,
-        telefono: data.telefono || "022222222",
+        telefono: data.telefono || '022222222',
         celular: data.celular,
         ciudad_id: data.ciudad,
         provincia_id: data.provincia,
@@ -175,15 +194,7 @@ export const NewClientDialog = ({ openDialog, setOpenDialog, cliente, setCliente
             <Controller
               name="ciRuc"
               control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  label="C.I./R.U.C."
-                  fullWidth
-                  size="small"
-                  disabled
-                />
-              )}
+              render={({ field }) => <TextField {...field} label="C.I./R.U.C." fullWidth size="small" disabled />}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -212,7 +223,7 @@ export const NewClientDialog = ({ openDialog, setOpenDialog, cliente, setCliente
                   label="Dirección/Sector"
                   fullWidth
                   size="small"
-                  error={!!errors.direccion} 
+                  error={!!errors.direccion}
                   helperText={errors.direccion?.message}
                 />
               )}
@@ -256,7 +267,14 @@ export const NewClientDialog = ({ openDialog, setOpenDialog, cliente, setCliente
               name="telefono"
               control={control}
               render={({ field }) => (
-                <TextField {...field} label="Teléfono" fullWidth size="small" error={!!errors.telefono} helperText={errors.telefono?.message}/>
+                <TextField
+                  {...field}
+                  label="Teléfono"
+                  fullWidth
+                  size="small"
+                  error={!!errors.telefono}
+                  helperText={errors.telefono?.message}
+                />
               )}
             />
           </Grid>
@@ -265,7 +283,14 @@ export const NewClientDialog = ({ openDialog, setOpenDialog, cliente, setCliente
               name="celular"
               control={control}
               render={({ field }) => (
-                <TextField {...field} label="Celular" fullWidth size="small" error={!!errors.celular} helperText={errors.celular?.message}/>
+                <TextField
+                  {...field}
+                  label="Celular"
+                  fullWidth
+                  size="small"
+                  error={!!errors.celular}
+                  helperText={errors.celular?.message}
+                />
               )}
             />
           </Grid>
@@ -278,7 +303,9 @@ export const NewClientDialog = ({ openDialog, setOpenDialog, cliente, setCliente
                   <InputLabel id="provincia-label">Provincia</InputLabel>
                   <Select {...field} labelId="provincia-label" label="Provincia">
                     {provincias.map((prov) => (
-                      <MenuItem key={prov.id} value={prov.id}>{prov.nombre}</MenuItem>
+                      <MenuItem key={prov.id} value={prov.id}>
+                        {prov.nombre}
+                      </MenuItem>
                     ))}
                   </Select>
                 </FormControl>
@@ -294,7 +321,9 @@ export const NewClientDialog = ({ openDialog, setOpenDialog, cliente, setCliente
                   <InputLabel id="ciudad-label">Ciudad</InputLabel>
                   <Select {...field} labelId="ciudad-label" label="Ciudad">
                     {ciudades.map((ciudad) => (
-                      <MenuItem key={ciudad.id} value={ciudad.id}>{ciudad.nombre}</MenuItem>
+                      <MenuItem key={ciudad.id} value={ciudad.id}>
+                        {ciudad.nombre}
+                      </MenuItem>
                     ))}
                   </Select>
                 </FormControl>
@@ -322,4 +351,3 @@ export const NewClientDialog = ({ openDialog, setOpenDialog, cliente, setCliente
     </Dialog>
   );
 };
-
