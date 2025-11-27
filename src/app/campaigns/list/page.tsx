@@ -74,6 +74,26 @@ const CampaignsPage = () => {
     }
   };
 
+  const toggleCanjeDigital = async (id: number) => {
+    try {
+      await axiosClient.post(
+        '/api/campanias/activarCanjeDigital',
+        {
+          idCampania: id,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      showSnackbar('Estado de la campaña actualizado con éxito', 'success');
+      await fetchCampaigns();
+    } catch (error) {
+      console.error('Error al cambiar estado de campaña', error);
+      showSnackbar('Hubo un error al cambiar el estado de la campaña', 'error');
+    }
+  };
   const fetchCampaigns = async () => {
     try {
       setLoading(true);
@@ -184,6 +204,7 @@ const CampaignsPage = () => {
                   <TableCell>Nombre</TableCell>
                   <TableCell>Descripción</TableCell>
                   <TableCell>Activo</TableCell>
+                  <TableCell>Canje Digital</TableCell>
                   <TableCell>Editar</TableCell>
                   <TableCell>Acciones</TableCell>
                 </TableRow>
@@ -200,6 +221,15 @@ const CampaignsPage = () => {
                         color={campaign.activo ? 'success' : 'error'}
                       >
                         {campaign.activo ? <CheckFat size={24} /> : <Prohibit size={24} />}
+                      </Button>
+                    </TableCell>
+                    <TableCell>
+                      <Button
+                        onClick={() => toggleCanjeDigital(campaign.id)}
+                        variant="text"
+                        color={campaign.canjedigital ? 'success' : 'error'}
+                      >
+                        {campaign.canjedigital ? <CheckFat size={24} /> : <Prohibit size={24} />}
                       </Button>
                     </TableCell>
                     <TableCell>

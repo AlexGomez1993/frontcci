@@ -97,12 +97,24 @@ const HomeClientPage = () => {
                       </Typography>
 
                       <Typography
+                        variant="body2"
+                        color="textSecondary"
+                        align="center"
+                        sx={{ fontWeight: 'bold', marginTop: '20px' }}
+                      >
+                        {campaign.canjedigital
+                          ? 'Canjea tus facturas de forma fácil y rápida a través del módulo Facturas Online -> Registrar Nueva Factura.'
+                          : 'Para canjear tus facturas, únicamente puedes hacerlo en nuestras islas físicas.'}
+                      </Typography>
+                      <Typography
                         variant="body1"
                         color="textSecondary"
                         align="center"
                         sx={{ fontWeight: 'bold', marginTop: '20px' }}
                       >
-                        ¡Recuerda! Las facturas son acumulables entre sí a partir de los $10.
+                        {campaign.configuracion.descripcion == 1
+                          ? '¡Recuerda! Las facturas son acumulables entre sí a partir de los $10.'
+                          : 'Para esta campaña, las facturas no son acumulables entre sí.'}
                       </Typography>
                       <Divider sx={{ margin: '10px 0' }} />
                       <Grid container spacing={3} justifyContent="center" alignItems="stretch">

@@ -2,6 +2,8 @@
 
 import React, { ChangeEvent, useEffect, useState } from 'react';
 import {
+  Alert,
+  Autocomplete,
   Avatar,
   Box,
   Button,
@@ -19,13 +21,11 @@ import {
   MenuItem,
   Select,
   SelectChangeEvent,
+  Snackbar,
   styled,
   TextField,
   Typography,
   useTheme,
-  Autocomplete,
-  Snackbar,
-  Alert,
 } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import Pagination from '@mui/material/Pagination';
@@ -36,13 +36,13 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import axiosClient from '@/lib/axiosClient';
-import { Invoice, CheckCircle, Warning } from '@phosphor-icons/react';
-import { Campaign, CampaignResponse } from '@/types/campaign';
-import { PaymentMethod, PaymentMethodResponse } from '@/types/payment_method';
-import { Store } from '@/types/comercial_store';
+import { CheckCircle, Invoice, Warning } from '@phosphor-icons/react';
 import moment from 'moment';
 
+import { Campaign, CampaignResponse } from '@/types/campaign';
+import { Store } from '@/types/comercial_store';
+import { PaymentMethod, PaymentMethodResponse } from '@/types/payment_method';
+import axiosClient from '@/lib/axiosClient';
 
 const floatAnimation = keyframes`
   0% { transform: translateY(0); }
@@ -86,8 +86,8 @@ interface Factura {
     nombre: string;
   };
   cupones?: {
-    numcupones: number
-  }[]
+    numcupones: number;
+  }[];
 }
 
 interface AprobadasDialogProps {
@@ -125,7 +125,6 @@ interface FacturaDialogProps {
   onClose: () => void;
   onSubmit: (formData: ProcessedFormData) => void;
 }
-
 
 const getEstadoNombre = (estado: number): string => {
   const estados: { [key: number]: string } = {
@@ -186,7 +185,6 @@ const StyledButton = styled(Button)(({ theme, colorvariant }: { theme?: any; col
   },
 }));
 
-
 const IconWrapper = styled('div')(({ theme }) => ({
   padding: theme.spacing(3),
   borderRadius: '50%',
@@ -239,14 +237,16 @@ const FacturaDialog = ({ open, onClose, onSubmit }: FacturaDialogProps) => {
   useEffect(() => {
     const fetchCampanias = async () => {
       try {
-        const response = await axiosClient.get<CampaignResponse>(`/api/campanias?activo=1`);
+        const response = await axiosClient.get<CampaignResponse>('/api/campanias', {
+          params: { activo: 1, canjeDigital: 1 },
+        });
         const campaniasActivas = response.data.data;
         setCampanias(campaniasActivas || []);
 
         if (campaniasActivas.length === 1) {
           const unicaCampania = campaniasActivas[0];
           setLocales(unicaCampania.tiendas || []);
-          setFormasPago(unicaCampania.formaspago || [])
+          setFormasPago(unicaCampania.formaspago || []);
           setFormData((prev) => ({
             ...prev,
             campania: String(unicaCampania.id),
@@ -275,12 +275,9 @@ const FacturaDialog = ({ open, onClose, onSubmit }: FacturaDialogProps) => {
         aceptaTerminos: false,
       });
 
-
       fetchCampanias();
     }
   }, [open]);
-
-
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>) => {
     const target = e.target as HTMLInputElement;
@@ -326,7 +323,7 @@ const FacturaDialog = ({ open, onClose, onSubmit }: FacturaDialogProps) => {
     try {
       const response = await axiosClient.post(`/api/facturas/validarFactura`, {
         numeroFactura: formData.numeroFactura,
-        tienda_id: formData.local
+        tienda_id: formData.local,
       });
 
       if (response.status === 200) {
@@ -350,26 +347,9 @@ const FacturaDialog = ({ open, onClose, onSubmit }: FacturaDialogProps) => {
   };
 
   const handleSubmit = async () => {
-    const {
-      campania,
-      local,
-      numeroFactura,
-      monto,
-      formaPago,
-      headerImage,
-      voucherImage,
-      aceptaTerminos,
-    } = formData;
+    const { campania, local, numeroFactura, monto, formaPago, headerImage, voucherImage, aceptaTerminos } = formData;
 
-    if (
-      !campania ||
-      !local ||
-      !numeroFactura ||
-      !monto ||
-      !formaPago ||
-      !headerImage ||
-      !aceptaTerminos
-    ) {
+    if (!campania || !local || !numeroFactura || !monto || !formaPago || !headerImage || !aceptaTerminos) {
       alert('Por favor complete todos los campos requeridos y suba la cabecera de la factura.');
       return;
     }
@@ -452,9 +432,7 @@ const FacturaDialog = ({ open, onClose, onSubmit }: FacturaDialogProps) => {
                   }));
                 }}
                 value={locales.find((loc) => loc.id.toString() === formData.local) || null}
-                renderInput={(params) => (
-                  <TextField {...params} label="Local" size="small" variant="outlined" />
-                )}
+                renderInput={(params) => <TextField {...params} label="Local" size="small" variant="outlined" />}
               />
             </FormControl>
           </Grid>
@@ -484,14 +462,14 @@ const FacturaDialog = ({ open, onClose, onSubmit }: FacturaDialogProps) => {
               onChange={(e) => {
                 let valor = e.target.value.replace(',', '.');
 
-                if (/^\d*\.?\d{0,2}$/.test(valor) || valor === "") {
+                if (/^\d*\.?\d{0,2}$/.test(valor) || valor === '') {
                   const customEvent = {
                     ...e,
                     target: {
                       ...e.target,
                       value: valor,
-                      name: 'monto'
-                    }
+                      name: 'monto',
+                    },
                   };
 
                   handleChange(customEvent as React.ChangeEvent<HTMLInputElement>);
@@ -505,8 +483,14 @@ const FacturaDialog = ({ open, onClose, onSubmit }: FacturaDialogProps) => {
           <Grid item xs={12} md={6}>
             <FormControl fullWidth>
               <InputLabel>Forma de Pago</InputLabel>
-              <Select name="formaPago" value={formData.formaPago} onChange={handleChange} label="Forma de Pago" variant="outlined"
-                size="small">
+              <Select
+                name="formaPago"
+                value={formData.formaPago}
+                onChange={handleChange}
+                label="Forma de Pago"
+                variant="outlined"
+                size="small"
+              >
                 {formasPago.map((forma) => (
                   <MenuItem key={forma.id} value={String(forma.id)}>
                     {forma.nombre}
@@ -615,7 +599,7 @@ const FacturaDialog = ({ open, onClose, onSubmit }: FacturaDialogProps) => {
           Registrar
         </Button>
       </DialogActions>
-            <Snackbar
+      <Snackbar
         open={snackbarOpen}
         autoHideDuration={2000}
         onClose={handleSnackbarClose}
@@ -721,120 +705,133 @@ const AprobadasDialog = ({ open, onClose }: AprobadasDialogProps) => {
     <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
       <DialogTitle>Facturas Aprobadas</DialogTitle>
       <DialogContent>
-        {loading ? (
-          <Box display="flex" justifyContent="center" p={4}>
-            <CircularProgress />
-          </Box>
-        ) : error ? (
-          <Typography color="error" p={2}>
-            {error}
-          </Typography>
-        ) : (
-          <>
-            <TableContainer component={Paper}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Fecha y hora de registro</TableCell>
-                    <TableCell>Campaña</TableCell>
-                    <TableCell>Local</TableCell>
-                    <TableCell>Factura</TableCell>
-                    <TableCell>Monto</TableCell>
-                    <TableCell>Forma de pago</TableCell>
-                    <TableCell>Cabecera factura</TableCell>
-                    <TableCell>Voucher</TableCell>
-                    <TableCell>Cupones</TableCell>
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Fecha y hora de registro</TableCell>
+                <TableCell>Campaña</TableCell>
+                <TableCell>Local</TableCell>
+                <TableCell>Factura</TableCell>
+                <TableCell>Monto</TableCell>
+                <TableCell>Forma de pago</TableCell>
+                <TableCell>Cabecera factura</TableCell>
+                <TableCell>Voucher</TableCell>
+                <TableCell>Cupones</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={9}>
+                    <Box display="flex" justifyContent="center" p={4}>
+                      <CircularProgress />
+                    </Box>
+                  </TableCell>
+                </TableRow>
+              ) : error ? (
+                <TableCell colSpan={9}>
+                  <Typography color="error" p={2}>
+                    {error}
+                  </Typography>
+                </TableCell>
+              ) : Array.isArray(aprobadasData) && aprobadasData.length > 0 ? (
+                aprobadasData.map((factura, index) => (
+                  <TableRow key={factura.id}>
+                    <TableCell>
+                      {moment(factura.fecha_registro).add(5, 'hours').format('DD/MM/YYYY HH:mm:ss')}
+                    </TableCell>
+                    <TableCell>{factura.campania}</TableCell>
+                    <TableCell>{factura.local}</TableCell>
+                    <TableCell>{factura.numero_factura}</TableCell>
+                    <TableCell>${factura.monto}</TableCell>
+                    <TableCell>{factura.forma_pago}</TableCell>
+                    <TableCell>
+                      <Avatar
+                        variant="rounded"
+                        alt="Cabecera"
+                        onClick={() => {
+                          if (factura.cabecera_image) {
+                            setSelectedImage(factura.cabecera_image);
+                            setOpenImageDialog(true);
+                          }
+                        }}
+                        sx={{
+                          width: 100,
+                          height: 50,
+                          cursor: factura.cabecera_image ? 'pointer' : 'default',
+                          bgcolor: factura.cabecera_image ? '#e3f2fd' : '#f5f5f5',
+                          color: factura.cabecera_image ? '#1976d2' : '#9e9e9e',
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          fontSize: 14,
+                          fontWeight: 'bold',
+                          border: factura.cabecera_image ? '2px dashed #90caf9' : '1px solid #ccc',
+                          transition: 'all 0.3s ease-in-out',
+                          '&:hover': factura.cabecera_image && {
+                            bgcolor: '#bbdefb',
+                            borderColor: '#1976d2',
+                            color: '#0d47a1',
+                            boxShadow: '0 4px 12px rgba(25, 118, 210, 0.2)',
+                          },
+                        }}
+                      >
+                        {factura.cabecera_image ? 'Ver Imagen' : 'Sin imagen'}
+                      </Avatar>
+                    </TableCell>
+                    <TableCell>
+                      <Avatar
+                        variant="rounded"
+                        alt="Voucher"
+                        onClick={() => {
+                          if (factura.voucher_image) {
+                            setSelectedImage(factura.voucher_image);
+                            setOpenImageDialog(true);
+                          }
+                        }}
+                        sx={{
+                          width: 100,
+                          height: 50,
+                          cursor: factura.voucher_image ? 'pointer' : 'default',
+                          bgcolor: factura.voucher_image ? '#e3f2fd' : '#f5f5f5',
+                          color: factura.voucher_image ? '#1976d2' : '#9e9e9e',
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          fontSize: 14,
+                          fontWeight: 'bold',
+                          border: factura.voucher_image ? '2px dashed #90caf9' : '1px solid #ccc',
+                          transition: 'all 0.3s ease-in-out',
+                          '&:hover': factura.voucher_image && {
+                            bgcolor: '#bbdefb',
+                            borderColor: '#1976d2',
+                            color: '#0d47a1',
+                            boxShadow: '0 4px 12px rgba(25, 118, 210, 0.2)',
+                          },
+                        }}
+                      >
+                        {factura.voucher_image ? 'Ver Voucher' : 'Sin voucher'}
+                      </Avatar>
+                    </TableCell>
+                    <TableCell>{factura.cupones}</TableCell>
                   </TableRow>
-                </TableHead>
-                <TableBody>
-                  {aprobadasData.map((factura, index) => (
-                    <TableRow key={factura.id}>
-                      <TableCell>{moment(factura.fecha_registro).add(5, 'hours').format('DD/MM/YYYY HH:mm:ss')}</TableCell>
-                      <TableCell>{factura.campania}</TableCell>
-                      <TableCell>{factura.local}</TableCell>
-                      <TableCell>{factura.numero_factura}</TableCell>
-                      <TableCell>${factura.monto}</TableCell>
-                      <TableCell>{factura.forma_pago}</TableCell>
-                      <TableCell>
-                        <Avatar
-                          variant="rounded"
-                          alt="Cabecera"
-                          onClick={() => {
-                            if (factura.cabecera_image) {
-                              setSelectedImage(factura.cabecera_image);
-                              setOpenImageDialog(true);
-                            }
-                          }}
-                          sx={{
-                            width: 100,
-                            height: 50,
-                            cursor: factura.cabecera_image ? 'pointer' : 'default',
-                            bgcolor: factura.cabecera_image ? '#e3f2fd' : '#f5f5f5',
-                            color: factura.cabecera_image ? '#1976d2' : '#9e9e9e',
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            fontSize: 14,
-                            fontWeight: 'bold',
-                            border: factura.cabecera_image ? '2px dashed #90caf9' : '1px solid #ccc',
-                            transition: 'all 0.3s ease-in-out',
-                            '&:hover': factura.cabecera_image && {
-                              bgcolor: '#bbdefb',
-                              borderColor: '#1976d2',
-                              color: '#0d47a1',
-                              boxShadow: '0 4px 12px rgba(25, 118, 210, 0.2)',
-                            },
-                          }}
-                        >
-                          {factura.cabecera_image ? 'Ver Imagen' : 'Sin imagen'}
-                        </Avatar>
-                      </TableCell>
-                      <TableCell>
-                        <Avatar
-                          variant="rounded"
-                          alt="Voucher"
-                          onClick={() => {
-                            if (factura.voucher_image) {
-                              setSelectedImage(factura.voucher_image);
-                              setOpenImageDialog(true);
-                            }
-                          }}
-                          sx={{
-                            width: 100,
-                            height: 50,
-                            cursor: factura.voucher_image ? 'pointer' : 'default',
-                            bgcolor: factura.voucher_image ? '#e3f2fd' : '#f5f5f5',
-                            color: factura.voucher_image ? '#1976d2' : '#9e9e9e',
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            fontSize: 14,
-                            fontWeight: 'bold',
-                            border: factura.voucher_image ? '2px dashed #90caf9' : '1px solid #ccc',
-                            transition: 'all 0.3s ease-in-out',
-                            '&:hover': factura.voucher_image && {
-                              bgcolor: '#bbdefb',
-                              borderColor: '#1976d2',
-                              color: '#0d47a1',
-                              boxShadow: '0 4px 12px rgba(25, 118, 210, 0.2)',
-                            },
-                          }}
-                        >
-                          {factura.voucher_image ? 'Ver Voucher' : 'Sin voucher'}
-                        </Avatar>
-                      </TableCell>
-                      <TableCell>{factura.cupones}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-
-            <Box display="flex" justifyContent="center" mt={2}>
-              <Pagination count={totalPages} page={currentPage} onChange={handlePageChange} color="primary" />
-            </Box>
-          </>
-        )}
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={9} align="center">
+                    <Typography p={2} color="textSecondary">
+                      No tiene facturas aprobadas de campañas activas.
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <Box display="flex" justifyContent="center" mt={2}>
+          <Pagination count={totalPages} page={currentPage} onChange={handlePageChange} color="primary" />
+        </Box>
       </DialogContent>
       <Dialog open={openImageDialog} onClose={() => setOpenImageDialog(false)} maxWidth="md">
         <DialogContent sx={{ p: 2 }}>
@@ -916,118 +913,131 @@ const PendienteDialog = ({ open, onClose }: PendienteDialogProps) => {
     <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
       <DialogTitle>Facturas Pendientes</DialogTitle>
       <DialogContent>
-        {loading ? (
-          <Box display="flex" justifyContent="center" p={4}>
-            <CircularProgress />
-          </Box>
-        ) : error ? (
-          <Typography color="error" p={2}>
-            {error}
-          </Typography>
-        ) : (
-          <>
-            <TableContainer component={Paper}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Fecha y hora de registro</TableCell>
-                    <TableCell>Campaña</TableCell>
-                    <TableCell>Local</TableCell>
-                    <TableCell>Factura</TableCell>
-                    <TableCell>Monto</TableCell>
-                    <TableCell>Forma de pago</TableCell>
-                    <TableCell>Cabecera factura</TableCell>
-                    <TableCell>Voucher</TableCell>
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Fecha y hora de registro</TableCell>
+                <TableCell>Campaña</TableCell>
+                <TableCell>Local</TableCell>
+                <TableCell>Factura</TableCell>
+                <TableCell>Monto</TableCell>
+                <TableCell>Forma de pago</TableCell>
+                <TableCell>Cabecera factura</TableCell>
+                <TableCell>Voucher</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={8}>
+                    <Box display="flex" justifyContent="center" p={4}>
+                      <CircularProgress />
+                    </Box>
+                  </TableCell>
+                </TableRow>
+              ) : error ? (
+                <TableCell colSpan={8}>
+                  <Typography color="error" p={2}>
+                    {error}
+                  </Typography>
+                </TableCell>
+              ) : Array.isArray(pendientesData) && pendientesData.length > 0 ? (
+                pendientesData.map((factura, index) => (
+                  <TableRow key={factura.id}>
+                    <TableCell>
+                      {moment(factura.fecha_registro).add(5, 'hours').format('DD/MM/YYYY HH:mm:ss')}
+                    </TableCell>
+                    <TableCell>{factura.campania}</TableCell>
+                    <TableCell>{factura.local}</TableCell>
+                    <TableCell>{factura.numero_factura}</TableCell>
+                    <TableCell>${factura.monto}</TableCell>
+                    <TableCell>{factura.forma_pago}</TableCell>
+                    <TableCell>
+                      <Avatar
+                        variant="rounded"
+                        alt="Cabecera"
+                        onClick={() => {
+                          if (factura.cabecera_image) {
+                            setSelectedImage(factura.cabecera_image);
+                            setOpenImageDialog(true);
+                          }
+                        }}
+                        sx={{
+                          width: 100,
+                          height: 50,
+                          cursor: factura.cabecera_image ? 'pointer' : 'default',
+                          bgcolor: factura.cabecera_image ? '#e3f2fd' : '#f5f5f5',
+                          color: factura.cabecera_image ? '#1976d2' : '#9e9e9e',
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          fontSize: 14,
+                          fontWeight: 'bold',
+                          border: factura.cabecera_image ? '2px dashed #90caf9' : '1px solid #ccc',
+                          transition: 'all 0.3s ease-in-out',
+                          '&:hover': factura.cabecera_image && {
+                            bgcolor: '#bbdefb',
+                            borderColor: '#1976d2',
+                            color: '#0d47a1',
+                            boxShadow: '0 4px 12px rgba(25, 118, 210, 0.2)',
+                          },
+                        }}
+                      >
+                        {factura.cabecera_image ? 'Ver Imagen' : 'Sin imagen'}
+                      </Avatar>
+                    </TableCell>
+                    <TableCell>
+                      <Avatar
+                        variant="rounded"
+                        alt="Voucher"
+                        onClick={() => {
+                          if (factura.voucher_image) {
+                            setSelectedImage(factura.voucher_image);
+                            setOpenImageDialog(true);
+                          }
+                        }}
+                        sx={{
+                          width: 100,
+                          height: 50,
+                          cursor: factura.voucher_image ? 'pointer' : 'default',
+                          bgcolor: factura.voucher_image ? '#e3f2fd' : '#f5f5f5',
+                          color: factura.voucher_image ? '#1976d2' : '#9e9e9e',
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          fontSize: 14,
+                          fontWeight: 'bold',
+                          border: factura.voucher_image ? '2px dashed #90caf9' : '1px solid #ccc',
+                          transition: 'all 0.3s ease-in-out',
+                          '&:hover': factura.voucher_image && {
+                            bgcolor: '#bbdefb',
+                            borderColor: '#1976d2',
+                            color: '#0d47a1',
+                            boxShadow: '0 4px 12px rgba(25, 118, 210, 0.2)',
+                          },
+                        }}
+                      >
+                        {factura.voucher_image ? 'Ver Voucher' : 'Sin voucher'}
+                      </Avatar>
+                    </TableCell>
                   </TableRow>
-                </TableHead>
-                <TableBody>
-                  {pendientesData.map((factura, index) => (
-                    <TableRow key={factura.id}>
-                      <TableCell>{moment(factura.fecha_registro).add(5, 'hours').format('DD/MM/YYYY HH:mm:ss')}</TableCell>
-                      <TableCell>{factura.campania}</TableCell>
-                      <TableCell>{factura.local}</TableCell>
-                      <TableCell>{factura.numero_factura}</TableCell>
-                      <TableCell>${factura.monto}</TableCell>
-                      <TableCell>{factura.forma_pago}</TableCell>
-                      <TableCell>
-                        <Avatar
-                          variant="rounded"
-                          alt="Cabecera"
-                          onClick={() => {
-                            if (factura.cabecera_image) {
-                              setSelectedImage(factura.cabecera_image);
-                              setOpenImageDialog(true);
-                            }
-                          }}
-                          sx={{
-                            width: 100,
-                            height: 50,
-                            cursor: factura.cabecera_image ? 'pointer' : 'default',
-                            bgcolor: factura.cabecera_image ? '#e3f2fd' : '#f5f5f5',
-                            color: factura.cabecera_image ? '#1976d2' : '#9e9e9e',
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            fontSize: 14,
-                            fontWeight: 'bold',
-                            border: factura.cabecera_image ? '2px dashed #90caf9' : '1px solid #ccc',
-                            transition: 'all 0.3s ease-in-out',
-                            '&:hover': factura.cabecera_image && {
-                              bgcolor: '#bbdefb',
-                              borderColor: '#1976d2',
-                              color: '#0d47a1',
-                              boxShadow: '0 4px 12px rgba(25, 118, 210, 0.2)',
-                            },
-                          }}
-                        >
-                          {factura.cabecera_image ? 'Ver Imagen' : 'Sin imagen'}
-                        </Avatar>
-                      </TableCell>
-                      <TableCell>
-                        <Avatar
-                          variant="rounded"
-                          alt="Voucher"
-                          onClick={() => {
-                            if (factura.voucher_image) {
-                              setSelectedImage(factura.voucher_image);
-                              setOpenImageDialog(true);
-                            }
-                          }}
-                          sx={{
-                            width: 100,
-                            height: 50,
-                            cursor: factura.voucher_image ? 'pointer' : 'default',
-                            bgcolor: factura.voucher_image ? '#e3f2fd' : '#f5f5f5',
-                            color: factura.voucher_image ? '#1976d2' : '#9e9e9e',
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            fontSize: 14,
-                            fontWeight: 'bold',
-                            border: factura.voucher_image ? '2px dashed #90caf9' : '1px solid #ccc',
-                            transition: 'all 0.3s ease-in-out',
-                            '&:hover': factura.voucher_image && {
-                              bgcolor: '#bbdefb',
-                              borderColor: '#1976d2',
-                              color: '#0d47a1',
-                              boxShadow: '0 4px 12px rgba(25, 118, 210, 0.2)',
-                            },
-                          }}
-                        >
-                          {factura.voucher_image ? 'Ver Voucher' : 'Sin voucher'}
-                        </Avatar>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-
-            <Box display="flex" justifyContent="center" mt={2}>
-              <Pagination count={totalPages} page={currentPage} onChange={handlePageChange} color="primary" />
-            </Box>
-          </>
-        )}
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={8} align="center">
+                    <Typography p={2} color="textSecondary">
+                      No tiene facturas pendientes de campañas activas.
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <Box display="flex" justifyContent="center" mt={2}>
+          <Pagination count={totalPages} page={currentPage} onChange={handlePageChange} color="primary" />
+        </Box>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cerrar</Button>
@@ -1065,7 +1075,8 @@ const RechazadasDialog = ({ open, onClose }: RechazadasDialogProps) => {
       const cedula = user.ruc;
 
       const response = await axiosClient.get(
-        `/api/facturas?estadoFactura=3&page=${currentPage}&limit=${pageSize}&cliente_id=${cliente_id}&campanias_activas=true`);
+        `/api/facturas?estadoFactura=3&page=${currentPage}&limit=${pageSize}&cliente_id=${cliente_id}&campanias_activas=true`
+      );
 
       const mappedData = response.data.data.map((factura: Factura) => ({
         id: factura.id,
@@ -1107,120 +1118,133 @@ const RechazadasDialog = ({ open, onClose }: RechazadasDialogProps) => {
     <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
       <DialogTitle>Facturas Rechazadas</DialogTitle>
       <DialogContent>
-        {loading ? (
-          <Box display="flex" justifyContent="center" p={4}>
-            <CircularProgress />
-          </Box>
-        ) : error ? (
-          <Typography color="error" p={2}>
-            {error}
-          </Typography>
-        ) : (
-          <>
-            <TableContainer component={Paper}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Fecha y hora de registro</TableCell>
-                    <TableCell>Campaña</TableCell>
-                    <TableCell>Local</TableCell>
-                    <TableCell>Factura</TableCell>
-                    <TableCell>Monto</TableCell>
-                    <TableCell>Forma de pago</TableCell>
-                    <TableCell>Cabecera factura</TableCell>
-                    <TableCell>Voucher</TableCell>
-                    <TableCell>Observación</TableCell>
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Fecha y hora de registro</TableCell>
+                <TableCell>Campaña</TableCell>
+                <TableCell>Local</TableCell>
+                <TableCell>Factura</TableCell>
+                <TableCell>Monto</TableCell>
+                <TableCell>Forma de pago</TableCell>
+                <TableCell>Cabecera factura</TableCell>
+                <TableCell>Voucher</TableCell>
+                <TableCell>Observación</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={9}>
+                    <Box display="flex" justifyContent="center" p={4}>
+                      <CircularProgress />
+                    </Box>
+                  </TableCell>
+                </TableRow>
+              ) : error ? (
+                <TableCell colSpan={9}>
+                  <Typography color="error" p={2}>
+                    {error}
+                  </Typography>
+                </TableCell>
+              ) : Array.isArray(rechazadasData) && rechazadasData.length > 0 ? (
+                rechazadasData.map((factura, index) => (
+                  <TableRow key={factura.id}>
+                    <TableCell>
+                      {moment(factura.fecha_registro).add(5, 'hours').format('DD/MM/YYYY HH:mm:ss')}
+                    </TableCell>
+                    <TableCell>{factura.campania}</TableCell>
+                    <TableCell>{factura.local}</TableCell>
+                    <TableCell>{factura.numero_factura}</TableCell>
+                    <TableCell>${factura.monto}</TableCell>
+                    <TableCell>{factura.forma_pago}</TableCell>
+                    <TableCell>
+                      <Avatar
+                        variant="rounded"
+                        alt="Cabecera"
+                        onClick={() => {
+                          if (factura.cabecera_image) {
+                            setSelectedImage(factura.cabecera_image);
+                            setOpenImageDialog(true);
+                          }
+                        }}
+                        sx={{
+                          width: 100,
+                          height: 50,
+                          cursor: factura.cabecera_image ? 'pointer' : 'default',
+                          bgcolor: factura.cabecera_image ? '#e3f2fd' : '#f5f5f5',
+                          color: factura.cabecera_image ? '#1976d2' : '#9e9e9e',
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          fontSize: 14,
+                          fontWeight: 'bold',
+                          border: factura.cabecera_image ? '2px dashed #90caf9' : '1px solid #ccc',
+                          transition: 'all 0.3s ease-in-out',
+                          '&:hover': factura.cabecera_image && {
+                            bgcolor: '#bbdefb',
+                            borderColor: '#1976d2',
+                            color: '#0d47a1',
+                            boxShadow: '0 4px 12px rgba(25, 118, 210, 0.2)',
+                          },
+                        }}
+                      >
+                        {factura.cabecera_image ? 'Ver Imagen' : 'Sin imagen'}
+                      </Avatar>
+                    </TableCell>
+                    <TableCell>
+                      <Avatar
+                        variant="rounded"
+                        alt="Voucher"
+                        onClick={() => {
+                          if (factura.voucher_image) {
+                            setSelectedImage(factura.voucher_image);
+                            setOpenImageDialog(true);
+                          }
+                        }}
+                        sx={{
+                          width: 100,
+                          height: 50,
+                          cursor: factura.voucher_image ? 'pointer' : 'default',
+                          bgcolor: factura.voucher_image ? '#e3f2fd' : '#f5f5f5',
+                          color: factura.voucher_image ? '#1976d2' : '#9e9e9e',
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          fontSize: 14,
+                          fontWeight: 'bold',
+                          border: factura.voucher_image ? '2px dashed #90caf9' : '1px solid #ccc',
+                          transition: 'all 0.3s ease-in-out',
+                          '&:hover': factura.voucher_image && {
+                            bgcolor: '#bbdefb',
+                            borderColor: '#1976d2',
+                            color: '#0d47a1',
+                            boxShadow: '0 4px 12px rgba(25, 118, 210, 0.2)',
+                          },
+                        }}
+                      >
+                        {factura.voucher_image ? 'Ver Voucher' : 'Sin voucher'}
+                      </Avatar>
+                    </TableCell>
+                    <TableCell>{factura.observacion}</TableCell>
                   </TableRow>
-                </TableHead>
-                <TableBody>
-                  {rechazadasData.map((factura, index) => (
-                    <TableRow key={factura.id}>
-                      <TableCell>{moment(factura.fecha_registro).add(5, 'hours').format('DD/MM/YYYY HH:mm:ss')}</TableCell>
-                      <TableCell>{factura.campania}</TableCell>
-                      <TableCell>{factura.local}</TableCell>
-                      <TableCell>{factura.numero_factura}</TableCell>
-                      <TableCell>${factura.monto}</TableCell>
-                      <TableCell>{factura.forma_pago}</TableCell>
-                      <TableCell>
-                        <Avatar
-                          variant="rounded"
-                          alt="Cabecera"
-                          onClick={() => {
-                            if (factura.cabecera_image) {
-                              setSelectedImage(factura.cabecera_image);
-                              setOpenImageDialog(true);
-                            }
-                          }}
-                          sx={{
-                            width: 100,
-                            height: 50,
-                            cursor: factura.cabecera_image ? 'pointer' : 'default',
-                            bgcolor: factura.cabecera_image ? '#e3f2fd' : '#f5f5f5',
-                            color: factura.cabecera_image ? '#1976d2' : '#9e9e9e',
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            fontSize: 14,
-                            fontWeight: 'bold',
-                            border: factura.cabecera_image ? '2px dashed #90caf9' : '1px solid #ccc',
-                            transition: 'all 0.3s ease-in-out',
-                            '&:hover': factura.cabecera_image && {
-                              bgcolor: '#bbdefb',
-                              borderColor: '#1976d2',
-                              color: '#0d47a1',
-                              boxShadow: '0 4px 12px rgba(25, 118, 210, 0.2)',
-                            },
-                          }}
-                        >
-                          {factura.cabecera_image ? 'Ver Imagen' : 'Sin imagen'}
-                        </Avatar>
-                      </TableCell>
-                      <TableCell>
-                        <Avatar
-                          variant="rounded"
-                          alt="Voucher"
-                          onClick={() => {
-                            if (factura.voucher_image) {
-                              setSelectedImage(factura.voucher_image);
-                              setOpenImageDialog(true);
-                            }
-                          }}
-                          sx={{
-                            width: 100,
-                            height: 50,
-                            cursor: factura.voucher_image ? 'pointer' : 'default',
-                            bgcolor: factura.voucher_image ? '#e3f2fd' : '#f5f5f5',
-                            color: factura.voucher_image ? '#1976d2' : '#9e9e9e',
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            fontSize: 14,
-                            fontWeight: 'bold',
-                            border: factura.voucher_image ? '2px dashed #90caf9' : '1px solid #ccc',
-                            transition: 'all 0.3s ease-in-out',
-                            '&:hover': factura.voucher_image && {
-                              bgcolor: '#bbdefb',
-                              borderColor: '#1976d2',
-                              color: '#0d47a1',
-                              boxShadow: '0 4px 12px rgba(25, 118, 210, 0.2)',
-                            },
-                          }}
-                        >
-                          {factura.voucher_image ? 'Ver Voucher' : 'Sin voucher'}
-                        </Avatar>
-                      </TableCell>
-                      <TableCell>{factura.observacion}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-
-            <Box display="flex" justifyContent="center" mt={2}>
-              <Pagination count={totalPages} page={currentPage} onChange={handlePageChange} color="primary" />
-            </Box>
-          </>
-        )}
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={9} align="center">
+                    <Typography p={2} color="textSecondary">
+                      No tiene facturas rechazadas de campañas activas.
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <Box display="flex" justifyContent="center" mt={2}>
+          <Pagination count={totalPages} page={currentPage} onChange={handlePageChange} color="primary" />
+        </Box>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cerrar</Button>
@@ -1245,7 +1269,7 @@ const BotonesFactura = () => {
   const handleSuccessOnClose = () => {
     setDialogOpen(false);
     setSuccessDialogOpen(false);
-  }
+  };
   const handleSubmitFactura = async (formData: ProcessedFormData) => {
     try {
       setLoading(true);
@@ -1278,16 +1302,16 @@ const BotonesFactura = () => {
         cliente_id: cliente_id,
         ruc: ruc,
         campanias: campaniasSeleccionadas,
-      }
+      };
 
       const response = await axiosClient.post(`/api/facturas/facturasWeb`, {
-        facturasCliente
+        facturasCliente,
       });
 
       const result = await response.data;
       console.log('Respuesta del backend:', result);
       setDialogOpen(false);
-      console.log('Factura registrada correctamente.')
+      console.log('Factura registrada correctamente.');
     } catch (error: any) {
       console.error('Error al registrar factura:', error);
       setError(error.message ? error.message : 'Error al cargar la factura');
@@ -1306,7 +1330,7 @@ const BotonesFactura = () => {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: ' center',
-        textAlign: 'center'
+        textAlign: 'center',
       }}
     >
       <Box sx={{ width: '100%' }}>
@@ -1351,7 +1375,7 @@ const BotonesFactura = () => {
                   width: '60px',
                   height: '60px',
                   objectFit: 'contain',
-                  marginBottom: '8px'
+                  marginBottom: '8px',
                 }}
               />
             </IconWrapper>
@@ -1423,43 +1447,41 @@ const BotonesFactura = () => {
       <PendienteDialog open={pendientesOpen} onClose={() => setPendientesOpen(false)} />
       <RechazadasDialog open={rechazadasOpen} onClose={() => setRechazadasOpen(false)} />
       <Dialog open={successDialogOpen} onClose={handleSuccessOnClose} maxWidth="sm" fullWidth>
-        {
-          loading ? (
-            <Box display="flex" justifyContent="center" p={4}>
-              <CircularProgress />
-            </Box>
-          ) : error ? (
-            <Typography color="error" p={2}>
-              {error}
-            </Typography>
-          ) : (
-            <>
-              <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <CheckCircle color="success" size={38} />
-                Factura Registrada
-              </DialogTitle>
-              <DialogContent dividers>
-                <Box sx={{ textAlign: 'center', p: 2 }}>
-                  <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold' }}>
-                    ¡Su factura ha sido ingresada correctamente!
-                  </Typography>
-                  <Typography variant="body1" gutterBottom>
-                    Será revisada por el personal de Servicio al Cliente.
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Para verificar si fue <strong>aprobada</strong>, <strong>rechazada</strong> o continúa <strong>pendiente</strong>,
-                    por favor consulte los módulos correspondientes en esta sección.
-                  </Typography>
-                </Box>
-              </DialogContent>
-              <DialogActions>
-                <Button onClick={handleSuccessOnClose} variant="contained" color="primary">
-                  Entendido
-                </Button>
-              </DialogActions>
-            </>
-          )
-        }
+        {loading ? (
+          <Box display="flex" justifyContent="center" p={4}>
+            <CircularProgress />
+          </Box>
+        ) : error ? (
+          <Typography color="error" p={2}>
+            {error}
+          </Typography>
+        ) : (
+          <>
+            <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <CheckCircle color="success" size={38} />
+              Factura Registrada
+            </DialogTitle>
+            <DialogContent dividers>
+              <Box sx={{ textAlign: 'center', p: 2 }}>
+                <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold' }}>
+                  ¡Su factura ha sido ingresada correctamente!
+                </Typography>
+                <Typography variant="body1" gutterBottom>
+                  Será revisada por el personal de Servicio al Cliente.
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Para verificar si fue <strong>aprobada</strong>, <strong>rechazada</strong> o continúa{' '}
+                  <strong>pendiente</strong>, por favor consulte los módulos correspondientes en esta sección.
+                </Typography>
+              </Box>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleSuccessOnClose} variant="contained" color="primary">
+                Entendido
+              </Button>
+            </DialogActions>
+          </>
+        )}
       </Dialog>
     </Box>
   );
