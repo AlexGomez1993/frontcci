@@ -501,7 +501,7 @@ const FacturaDialog = ({ open, onClose, onSubmit }: FacturaDialogProps) => {
           </Grid>
           <Grid item xs={12} md={6}>
             <Button variant="contained" component="label">
-              Subir Cabecera de Factura
+              Subir Imagen de Factura
               <input
                 type="file"
                 hidden
@@ -524,7 +524,7 @@ const FacturaDialog = ({ open, onClose, onSubmit }: FacturaDialogProps) => {
             </Button>
 
             <Typography variant="caption" sx={{ mt: 1, display: 'block' }}>
-              En la imagen se deben ver los datos del cliente.
+              En la imagen se debe poder ver los datos del cliente, el monto total y el lugar de compra.
             </Typography>
 
             {formData.headerImage && (
@@ -581,7 +581,7 @@ const FacturaDialog = ({ open, onClose, onSubmit }: FacturaDialogProps) => {
               control={<Checkbox name="aceptaTerminos" checked={formData.aceptaTerminos} onChange={handleChange} />}
               label="Acepto Términos y Condiciones"
             />
-            <Typography variant="body2" align="center" sx={{ mt: 1, px: 2 }}>
+            <Typography variant="body2" align="justify" sx={{ mt: 1, px: 2 }}>
               Nota: Favor conservar sus facturas. <br />
               “DATATRUST S.A. informa que, al participar en esta campaña, usted consiente libre y voluntariamente el
               tratamiento de sus datos personales para: Gestionar su participación en la presente campaña; enviar a su
@@ -597,7 +597,7 @@ const FacturaDialog = ({ open, onClose, onSubmit }: FacturaDialogProps) => {
                 </a>
               </strong>
               , o envíe un correo a:{' '}
-              <strong>protecciondatos@datatrust.com.ec / delegadoprotecciondatos@datatrust.com.ec</strong>”
+              <strong>protecciondatos@datatrust.com.ec/delegadoprotecciondatos@datatrust.com.ec</strong>”
             </Typography>
           </Grid>
         </Grid>
