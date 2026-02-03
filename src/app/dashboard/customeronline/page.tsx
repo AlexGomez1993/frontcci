@@ -583,21 +583,24 @@ const FacturaDialog = ({ open, onClose, onSubmit }: FacturaDialogProps) => {
             />
             <Typography variant="body2" align="justify" sx={{ mt: 1, px: 2 }}>
               Nota: Favor conservar sus facturas. <br />
-              “DATATRUST S.A. informa que, al participar en esta campaña, usted consiente libre y voluntariamente el
-              tratamiento de sus datos personales para: Gestionar su participación en la presente campaña; enviar a su
-              correo electrónico información publicitaria sobre futuras campañas y promociones del Centro Comercial
-              Iñaquito. El tratamiento se realiza conforme a la Ley Orgánica de Protección de Datos Personales. Los
-              datos se almacenarán hasta la terminación de la campaña y se garantiza su seguridad mediante medidas
+              DATATRUST S.A.S., informa que, al participar en esta campaña, usted consiente libre y voluntariamente el
+              tratamiento de sus datos personales proporcionados en el boleto para: (i) Gestionar su participación en la
+              presente campaña y enviar a su correo electrónico información publicitaria sobre futuras campañas y
+              promociones organizadas por DATATRUST S.A.S., para sí mismo o para las compañías [SMO, CCE, IMODIAMANTE y
+              CONDADO]; (ii) transferir los datos (Nombres, apellidos y número de cédula, correo electrónico y número de
+              teléfono) a la Compañía D2M PUBLICIDAD CIA. LTDA., en caso de ser beneficiario (ganador) del sorteo, para
+              la coordinación necesaria para la emisión y entrega del premio. Los datos proporcionados se almacenarán
+              hasta que usted revoque su consentimiento. Se garantiza la seguridad del tratamiento mediante medidas
               organizativas, administrativas, técnicas y legales. Usted puede revocar su consentimiento en cualquier
-              momento. Para ejercer sus derechos (Acceso, Rectificación, Eliminación, Oposición, etc.) y obtener mayor
-              información sobre el tratamiento que se realizará, por favor: Ingrese al siguiente link{' '}
+              momento. Para ejercer sus derechos y obtener más información sobre el tratamiento que se realizará, por
+              favor ingrese al siguiente enlace{' '}
               <strong>
                 <a href="https://datatrust.com.ec/cce/" target="_blank">
                   https://datatrust.com.ec/cce/
                 </a>
               </strong>
               , o envíe un correo a:{' '}
-              <strong>protecciondatos@datatrust.com.ec/delegadoprotecciondatos@datatrust.com.ec</strong>”
+              <strong>protecciondatos@datatrust.com.ec / delegadoprotecciondatos@datatrust.com.ec</strong>
             </Typography>
           </Grid>
         </Grid>
