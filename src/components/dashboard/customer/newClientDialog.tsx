@@ -217,6 +217,7 @@ export const NewClientDialog = ({ openDialog, setOpenDialog, cliente, setCliente
                   {...field}
                   label="Celular"
                   fullWidth
+                  inputProps={{ maxLength: 10 }}
                   size="small"
                   error={!!errors.celular}
                   helperText={errors.celular?.message}

@@ -205,6 +205,7 @@ export function NewClientForm({
                   {...field}
                   fullWidth
                   label="Celular"
+                  inputProps={{ maxLength: 10 }}
                   error={!!errors.celular}
                   helperText={errors.celular?.message}
                   size="small"
