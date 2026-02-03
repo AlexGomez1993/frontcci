@@ -590,10 +590,10 @@ export default function FacturaForm() {
           <body>
             <table>
               <tr>
-                <td style="text-align:left;">
+                <td style="text-align:left; width:50%;">
                   <img src="/assets/CCI.png" style="width:50px;" />
                 </td>
-                <td style="text-align:right;">
+                <td style="text-align:right; width:50%;">
                   <img src="${process.env.NEXT_PUBLIC_API_URL! + logo}" style="width:125px; height:75px" />
                 </td>
               </tr>
@@ -608,12 +608,15 @@ export default function FacturaForm() {
               <tr>
                 <td colspan="2">
                   <strong>Nota: Favor conservar sus facturas.</strong><br>
-                  <span class="texto-justificado">
-                    “El cliente para participar en la promoción confiere voluntariamente sus datos personales, y autoriza a que
-                    los mismos sean recopilados y utilizados para las campañas del Centro Comercial, tratados de conformidad con
-                    la Ley Orgánica de Protección de Datos Personales. Estos no serán transferidos a terceros. Si el cliente no
-                    desea constar en la base de datos del centro comercial, puede solicitar su eliminación al correo
-                    info-scala@smo.ec.”
+                  <span class="texto-justificado"  style="font-size:7pt";>
+                    “DATATRUST S.A. informa que, al participar en esta campaña, usted consiente libre y voluntariamente el tratamiento
+                    de sus datos personales para: Gestionar su participación en la presente campaña; enviar a su correo electrónico información
+                    publicitaria sobre futuras campañas y promociones del Centro Comercial Iñaquito. El tratamiento se realiza conforme a 
+                    la Ley Orgánica de Protección de Datos Personales. Los datos se almacenarán hasta la terminación de la campaña y se garantiza 
+                    su seguridad mediante medidas organizativas, administrativas, técnicas y legales. Usted puede revocar su consentimiento en cualquier 
+                    momento. Para ejercer sus derechos (Acceso, Rectificación, Eliminación, Oposición, etc.) y obtener mayor información sobre el tratamiento 
+                    que se realizará, por favor:
+                    Ingrese al siguiente link <strong>https://datatrust.com.ec/cce/</strong>, o envíe un correo a: <strong>protecciondatos@datatrust.com.ec / delegadoprotecciondatos@datatrust.com.ec</strong>”
                   </span>
                 </td>
               </tr>

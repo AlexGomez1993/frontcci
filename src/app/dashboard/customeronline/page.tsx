@@ -583,12 +583,21 @@ const FacturaDialog = ({ open, onClose, onSubmit }: FacturaDialogProps) => {
             />
             <Typography variant="body2" align="center" sx={{ mt: 1, px: 2 }}>
               Nota: Favor conservar sus facturas. <br />
-              “El cliente para participar en la promoción confiere voluntariamente sus datos personales, y autoriza a
-              que los mismos sean recopilados, utilizados para las campañas que realice el Centro Comercial y tratados
-              de conformidad con lo estipulado en la Ley Orgánica de Protección de Datos Personales, éstos no serán
-              transferidos a terceros. En caso de que el cliente no desee constar en la base de datos del centro
-              comercial, solicitará su eliminación al correo
-              <strong> info-scala@smo.ec</strong>.”
+              “DATATRUST S.A. informa que, al participar en esta campaña, usted consiente libre y voluntariamente el
+              tratamiento de sus datos personales para: Gestionar su participación en la presente campaña; enviar a su
+              correo electrónico información publicitaria sobre futuras campañas y promociones del Centro Comercial
+              Iñaquito. El tratamiento se realiza conforme a la Ley Orgánica de Protección de Datos Personales. Los
+              datos se almacenarán hasta la terminación de la campaña y se garantiza su seguridad mediante medidas
+              organizativas, administrativas, técnicas y legales. Usted puede revocar su consentimiento en cualquier
+              momento. Para ejercer sus derechos (Acceso, Rectificación, Eliminación, Oposición, etc.) y obtener mayor
+              información sobre el tratamiento que se realizará, por favor: Ingrese al siguiente link{' '}
+              <strong>
+                <a href="https://datatrust.com.ec/cce/" target="_blank">
+                  https://datatrust.com.ec/cce/
+                </a>
+              </strong>
+              , o envíe un correo a:{' '}
+              <strong>protecciondatos@datatrust.com.ec / delegadoprotecciondatos@datatrust.com.ec</strong>”
             </Typography>
           </Grid>
         </Grid>
