@@ -25,7 +25,7 @@ export function isCedulaEcuador(numero: string): boolean {
   return false;
 }
 
-export function isRucEcuador(numero: string): boolean {
+export function isRucEcuador_Antes(numero: string): boolean {
   if (!/^\d{13}$/.test(numero)) return false;
 
   const d = numero.split('').map(Number);
@@ -65,6 +65,13 @@ export function isRucEcuador(numero: string): boolean {
   }
 
   return false;
+}
+export function isRucEcuador(numero: string): boolean {
+  // Verificar si el RUC tiene exactamente 13 dígitos y solo contiene números
+  if (/^\d{13}$/.test(numero)) {
+    return true; // RUC con formato válido
+  }
+  return false; // RUC con formato incorrecto
 }
 
 export function isPasaporte(numero: string): boolean {
