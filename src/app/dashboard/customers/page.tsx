@@ -612,11 +612,10 @@ export default function FacturaForm() {
                     DATATRUST S.A.S., informa que, al participar en esta campaña, usted consiente libre y voluntariamente el tratamiento
                     de sus datos personales proporcionados en el boleto para: (i) Gestionar su participación en la presente campaña y enviar a su correo
                     electrónico información publicitaria sobre futuras campañas y promociones organizadas por DATATRUST S.A.S., para sí mismo o para las
-                    compañías [SMO, CCE, IMODIAMANTE y CONDADO]; (ii) transferir los datos (Nombres, apellidos y número de cédula, correo electrónico y número de teléfono) 
-                    a la Compañía D2M PUBLICIDAD CIA. LTDA., en caso de ser beneficiario (ganador) del sorteo, para la coordinación necesaria para la emisión y entrega del premio. 
-                    Los datos proporcionados se almacenarán hasta que usted revoque su consentimiento. Se garantiza la seguridad del tratamiento mediante medidas organizativas, administrativas, 
-                    técnicas y legales. Usted puede revocar su consentimiento en cualquier momento. Para ejercer sus derechos y obtener más información sobre el tratamiento que se realizará, 
-                    por favor ingrese al siguiente enlace <strong>https://datatrust.com.ec/cce/</strong>, o envíe un correo a:
+                    compañías [SMO, CCE, INMODIAMANTE y CENTRO COMERCIAL EL CONDADO]. Los datos proporcionados se almacenarán hasta que usted revoque su
+                    consentimiento. Se garantiza la seguridad del tratamiento mediante medidas organizativas, administrativas, técnicas y legales. Usted
+                    puede revocar su consentimiento en cualquier momento. Para ejercer sus derechos y obtener más información sobre el tratamiento que se
+                    realizará, por favor ingrese al siguiente enlace <strong>https://datatrust.com.ec/cce/</strong>, o envíe un correo a:
                     <strong>protecciondatos@datatrust.com.ec / delegadoprotecciondatos@datatrust.com.ec</strong>
                   </span>
                 </td>
